@@ -26,11 +26,11 @@ export const formatString = (template: string, ...args: string[]): string => {
  * @returns Whether the app is now ready
  */
 export const waitForAppReady = async (retries: number): Promise<boolean> => {
-  let status: string = '';
+  let status: string | null | undefined;
   while (true) {
     let counter: number = 0;
     const ui = (await ECP(endpoints['appUI'], 'GET')) as Document;
-    status = ui.getElementsByTagName('status')[0].childNodes[0].nodeValue;
+    status = ui.getElementsByTagName('status')[0]?.childNodes[0]?.nodeValue;
     if (status === 'OK') break;
     counter++;
     if (counter < retries) {

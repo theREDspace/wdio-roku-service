@@ -8,13 +8,7 @@ import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';
 import { installByID, installFromZip } from './install';
 
-export default class CustomWorkerService implements Services.ServiceInstance {
-  private _browser: WebdriverIO.Browser;
-
-  constructor() {
-    // ...
-  }
-
+export default class RokuWorkerService implements Services.ServiceInstance {
   async before(config: Options.Testrunner, specs: string[], browser: WebdriverIO.Browser) {
     if (!process.env.ROKU_IP) {
       throw new SevereServiceError('Roku IP is not set within the environment!');
@@ -55,13 +49,12 @@ export default class CustomWorkerService implements Services.ServiceInstance {
       const sourceString = new XMLSerializer().serializeToString(source);
       try {
         writeFileSync(output.name, sourceString);
+        //@ts-expect-error
         return this.open(output.name);
       } catch {
         console.error(`Failed to write Roku xml to temporary file ${output.name}.`);
       }
     });
-
-    this._browser = browser;
 
     if (process.env.ROKU_CHANNEL_ID) {
       await installByID(process.env.ROKU_CHANNEL_ID);
