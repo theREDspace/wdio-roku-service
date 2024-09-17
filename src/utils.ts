@@ -1,6 +1,6 @@
-import { ECP } from "./ecp";
-import { endpoints } from "./constants";
-import type { Document } from "@xmldom/xmldom";
+import { ECP } from './ecp';
+import { endpoints } from './constants';
+import type { Document } from '@xmldom/xmldom';
 
 /**
  * Allows for implicit wait in tests.
@@ -9,7 +9,7 @@ import type { Document } from "@xmldom/xmldom";
  * @returns Promise<unknown>
  */
 export const sleep = (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
@@ -17,7 +17,7 @@ export const sleep = (ms: number) => {
  * @returns string
  */
 export const formatString = (template: string, ...args: string[]): string => {
-    return template.replace(/%s/g, () => args.shift() || "");
+  return template.replace(/%s/g, () => args.shift() || '');
 };
 
 /**
@@ -26,18 +26,18 @@ export const formatString = (template: string, ...args: string[]): string => {
  * @returns Whether the app is now ready
  */
 export const waitForAppReady = async (retries: number): Promise<boolean> => {
-      let status: string = "";
-      while (true) {
-        let counter: number = 0;
-        const ui = await ECP(endpoints["appUI"], "GET") as Document;
-        status = ui.getElementsByTagName("status")[0].childNodes[0].nodeValue;
-        if (status === "OK") break;
-        counter++;
-        if (counter < retries) {
-          await sleep(5000);
-        } else {
-          break;
-        }
-      }
-      return status === "OK" ? true : false;
-  };
+  let status: string = '';
+  while (true) {
+    let counter: number = 0;
+    const ui = (await ECP(endpoints['appUI'], 'GET')) as Document;
+    status = ui.getElementsByTagName('status')[0].childNodes[0].nodeValue;
+    if (status === 'OK') break;
+    counter++;
+    if (counter < retries) {
+      await sleep(5000);
+    } else {
+      break;
+    }
+  }
+  return status === 'OK' ? true : false;
+};

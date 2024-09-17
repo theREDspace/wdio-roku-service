@@ -1,6 +1,6 @@
-import { ECP } from "./ecp";
-import { endpoints } from "./constants";
-import { sleep, formatString } from "./utils"
+import { ECP } from './ecp';
+import { endpoints } from './constants';
+import { sleep, formatString } from './utils';
 
 /**
  * Sends a key down command to the Roku.
@@ -9,8 +9,8 @@ import { sleep, formatString } from "./utils"
  * @returns Whether the input succeeded.
  */
 export const keyDown = async (key: string) => {
-      const uri: string = formatString(endpoints["keydown"], key);
-      return ECP(uri, "POST");
+  const uri: string = formatString(endpoints['keydown'], key);
+  return ECP(uri, 'POST');
 };
 
 /**
@@ -20,8 +20,8 @@ export const keyDown = async (key: string) => {
  * @returns Whether the input succeeded.
  */
 export const keyUp = async (key: string) => {
-      const uri: string = formatString(endpoints["keyup"], key);
-      return ECP(uri, "POST");
+  const uri: string = formatString(endpoints['keyup'], key);
+  return ECP(uri, 'POST');
 };
 
 /**
@@ -31,8 +31,8 @@ export const keyUp = async (key: string) => {
  * @returns Whether the input succeeded.
  */
 export const keyPress = async (key: string) => {
-      const uri: string = formatString(endpoints["keypress"], key);
-      return ECP(uri, "POST");
+  const uri: string = formatString(endpoints['keypress'], key);
+  return ECP(uri, 'POST');
 };
 
 /**
@@ -42,26 +42,26 @@ export const keyPress = async (key: string) => {
  * @returns Whether every input succeeded.
  */
 export const keySequence = async (keys: string[]): Promise<boolean> => {
-    for(const key of keys) {
-        try {
-            await keyPress(key);
-            await sleep(500);
-        } catch {
-            return false;
-        }
+  for (const key of keys) {
+    try {
+      await keyPress(key);
+      await sleep(500);
+    } catch {
+      return false;
     }
-    return true;
+  }
+  return true;
 };
 
 /**
  * Converts a string into keyboard presses and sends them to the Roku.
  * Use keyPress(Buttons.Enter) to complete the entry field.
- * 
+ *
  * @param inputString The string to enter using the keyboard
  * @returns Whether all the keypresses succeeded.
  */
 export const keyboardInput = (inputString: string): Promise<boolean> => {
-  const chars = inputString.split("");
-  const keys:string[] = chars.map((char) => `Lit_${encodeURIComponent(char)}`);
+  const chars = inputString.split('');
+  const keys: string[] = chars.map((char) => `Lit_${encodeURIComponent(char)}`);
   return keySequence(keys);
-}
+};
