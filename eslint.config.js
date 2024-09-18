@@ -8,11 +8,11 @@ import importX from 'eslint-plugin-import-x';
 export default [
   // Ignored dirs
   {
-    ignores: ['**/dist/**/*', '@types/**/*'],
+    ignores: ['**/dist/**/*'],
   },
   // All files
   {
-    files: ['**/*.{js,mjs,ts}'],
+    files: ['**/*.{js,ts}'],
     languageOptions: {
       ecmaVersion: 'latest',
       globals: {
@@ -34,31 +34,6 @@ export default [
     },
     settings: {
       'import-x/ignore': [/@rollup.*/, /shelljs/],
-    },
-  },
-  // Node & Electron main process files and scripts
-  {
-    files: ['**/*.{js,mjs,ts}'],
-    ignores: ['apps/**/src/preload.ts', 'apps/**/src/util.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.node,
-      },
-    },
-    settings: {
-      ...importX.flatConfigs.electron.settings,
-    },
-  },
-  // Electron renderer process files
-  {
-    files: ['apps/**/src/preload.ts', 'apps/**/src/util.ts'],
-    languageOptions: {
-      globals: {
-        ...globals.browser,
-      },
-    },
-    settings: {
-      ...importX.flatConfigs.electron.settings,
     },
   },
   // TS files
