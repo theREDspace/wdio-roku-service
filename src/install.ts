@@ -1,6 +1,5 @@
-import { ECP } from './ecp';
+import { ECP, endpoints } from './ecp';
 import { launchChannel } from './channel';
-import { endpoints } from './constants';
 import { sleep, formatString, waitForAppReady } from './utils';
 import { createHash, randomBytes } from 'crypto';
 import * as fs from 'fs';

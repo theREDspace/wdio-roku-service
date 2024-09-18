@@ -1,6 +1,5 @@
 import { formatString } from './utils';
-import { endpoints } from './constants';
-import { ECP } from './ecp';
+import { ECP, endpoints } from './ecp';
 
 /**
  * Returns the app icon for the channel ID specified.

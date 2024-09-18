@@ -1,5 +1,4 @@
-import { ECP } from './ecp';
-import { endpoints } from './constants';
+import { ECP, endpoints } from './ecp';
 import type { Document } from '@xmldom/xmldom';
 
 /**

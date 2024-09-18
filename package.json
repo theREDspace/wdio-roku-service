@@ -17,6 +17,32 @@
         "wdio-service",
         "roku"
     ],
+    "exports": {
+        ".": {
+            "require": "./dist/index.js",
+            "types": "./dist/index.d.ts"
+        },
+        "./controller": {
+            "require": "./dist/controller.js",
+            "types": "./dist/controller.d.ts"
+        },
+        "./info": {
+            "require": "./dist/info.js",
+            "types": "./dist/info.d.ts"
+        },
+        "./channel": {
+            "require": "./dist/channel.js",
+            "types": "./dist/channel.d.ts"
+        },
+        "./ecp": {
+            "require": "./dist/ecp.js",
+            "types": "./dist/ecp.d.ts"
+        },
+        "./install": {
+            "require": "./dist/install.js",
+            "types": "./dist/install.d.ts"
+        }
+    },
     "dependencies": {
         "@wdio/globals": "^9.0.9",
         "@wdio/logger": "^9.0.8",

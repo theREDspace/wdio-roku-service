@@ -1,8 +1,7 @@
 import type { Options, Services } from '@wdio/types';
 import { SevereServiceError } from 'webdriverio';
 import type { Document } from '@xmldom/xmldom';
-import { ECP } from './ecp';
-import { endpoints } from './constants';
+import { ECP, endpoints } from './ecp';
 import { XMLSerializer } from '@xmldom/xmldom';
 import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';

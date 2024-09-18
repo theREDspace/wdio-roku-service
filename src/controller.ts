@@ -1,6 +1,26 @@
-import { ECP } from './ecp';
-import { endpoints } from './constants';
+import { ECP, endpoints } from './ecp';
 import { sleep, formatString } from './utils';
+
+/**
+ * Controller mapping string enum.
+ */
+export const enum Buttons {
+  HOME = 'Home',
+  UP = 'Up',
+  DOWN = 'Down',
+  LEFT = 'Left',
+  RIGHT = 'Right',
+  SELECT = 'Select',
+  REVERSE = 'Reverse',
+  FORWARD = 'Forward',
+  PLAY = 'Play',
+  BACK = 'Back',
+  INSTANT_REPLAY = 'InstantReplay',
+  INFO = 'Info',
+  BACKSPACE = 'Backspace',
+  SEARCH = 'Search',
+  ENTER = 'Enter',
+}
 
 /**
  * Sends a key down command to the Roku.
