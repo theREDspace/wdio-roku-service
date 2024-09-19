@@ -53,7 +53,7 @@ await browser.loadRokuXML();
 ```
 
 Other Functions:
-* `wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app.
+* `wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app, and `launchChannel` can be used to deeplink to specific content.
 * `wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
 * `wdio-roku-service/install` provides install-related functionality if you want to do it manually.
 * `wdio-roku-service/ecp` is the direct interface with the ECP if you need to do anything highly specific.

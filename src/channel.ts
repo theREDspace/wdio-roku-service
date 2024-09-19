@@ -39,8 +39,9 @@ export const launchChannel = (
 export const inputChannel = (params: object): Promise<Response | Document> => {
   let uri = `${endpoints['input']}`;
   Object.entries(params).forEach((param) => {
-    uri = uri + param[0] + '=' + param[1] + '&';
+    uri = uri + encodeURIComponent(param[0]) + '=' + encodeURIComponent(param[1]) + '&';
   });
+  // Remove final &
   uri = uri.slice(0, -1);
   return ECP(uri, 'POST');
 };
