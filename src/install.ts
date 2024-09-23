@@ -29,7 +29,7 @@ export const installByID = async (channelId: string): Promise<boolean> => {
  * @returns A promise containing a boolean. Indicates whether a sideload has completed successfully or not.
  */
 export const installFromZip = async (pathToArchive: string): Promise<boolean> => {
-  const headers = await getAuthHeaders(endpoints['load'], 'POST');
+  const headers = await getAuthHeaders(endpoints.load, 'POST');
   if (headers === undefined) return false;
 
   const form = new FormData();
@@ -46,7 +46,7 @@ export const installFromZip = async (pathToArchive: string): Promise<boolean> =>
     return false;
   }
 
-  const response: Response = (await ECP(endpoints['load'], 'POST', false, form, headers)) as Response;
+  const response: Response = (await ECP(endpoints.load, 'POST', false, form, headers)) as Response;
   if (response.status !== 200) return false;
   // If the app hasn't loaded after 20 seconds, it probably isn't going to.
   return await waitForAppReady(5);

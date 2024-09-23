@@ -19,9 +19,9 @@ export const endpoints = {
   keypress: 'keypress/%s',
   keyup: 'keyup/%s',
   launch: 'launch/%s?contentId=%s&mediaType=%s',
-  load: '/plugin_install',
+  load: 'plugin_install',
   player: 'query/media-player',
-  screenshot: '/plugin_inspect',
+  screenshot: 'plugin_inspect',
   sgnodes: 'query/sgnodes/all',
   sgnodesroot: 'query/sgnodes/roots',
 };

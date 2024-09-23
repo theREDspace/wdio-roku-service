@@ -28,9 +28,9 @@ Channel Installation
 Archive Installation
 
 * ROKU_APP_PATH: This should be the path to the archive of your Roku app.
-* ROKU_USER and ROKU_PW: Login credentials are needed to install an archive.
+* ROKU_USER and ROKU_PW: Login credentials are needed to install an archive, as well as for taking screenshots.
 
-You can leave all four blank if you wish to install the app yourself instead.
+You can leave both blank if you wish to install the app yourself instead.
 
 ## Usage
 `wdio-roku-service/controller` provides the ability to send button presses to the Roku. `keySequence` is the main one, sending several button presses in sequence.

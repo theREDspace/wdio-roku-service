@@ -81,13 +81,13 @@ export const getSGOrphans = async () => {
  * @returns The response from the ECP
  */
 export const getScreenshot = async (): Promise<Response> => {
-  const headers = await getAuthHeaders(endpoints['screenshot'], 'POST');
+  const headers = await getAuthHeaders(endpoints.screenshot, 'POST');
   if (headers === undefined) throw new Error("getAuthHeaders failed!");
 
   const form = new FormData();
   form.append('mysubmit', 'Screenshot');
 
-  const response: Response = (await ECP(endpoints['screenshot'], 'GET', false, form, headers)) as Response;
+  const response: Response = (await ECP(endpoints.screenshot, 'GET', false, form, headers)) as Response;
   if (response.status !== 200) throw new Error("ECP call failed for screenshot!");
   return response;
 };
