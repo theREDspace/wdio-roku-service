@@ -19,7 +19,7 @@ See the .env.example file. Copy it and rename it to .env within your project. Yo
 
 * ROKU_IP should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
 
-There are two options for installation.
+Then, there are two options for installation. The service will do the installation automatically before the tests.
 
 Channel Installation
 
@@ -38,21 +38,22 @@ You can leave all four blank if you wish to install the app yourself instead.
 import { Buttons, keySequence } from "wdio-roku-service/controller";
 
 // Navigate through the app
-await keySequence(Buttons.LEFT, Buttons.LEFT, Buttons.DOWN, Buttons.Select);
+await keySequence(Buttons.LEFT, Buttons.LEFT, Buttons.SELECT, Buttons.DOWN, Buttons.SELECT);
 // Fetch the current app UI from the Roku and load it into the browser
 await browser.loadRokuXML();
 // use WDIO functionality on the roku XML as if it was a webpage
 ```
 `wdio-roku-service/controller` also has functions for holding or releasing buttons as well as typing text into a keyboard.
 ```js
-import { Buttons, keyboardInput, keyPress } from "wdio-roku-service/controller";
+import { Buttons, keyboardInput, keyPress, keySequence } from "wdio-roku-service/controller";
 
+await keySequence(Buttons.DOWN, Buttons.DOWN, Buttons.SELECT);
 await keyboardInput("example");
 await keyPress(Buttons.ENTER);
 await browser.loadRokuXML();
 ```
 
-Other Functions:
+### Other Functions
 * `wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app, and `launchChannel` can be used to deeplink to specific content.
 * `wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
 * `wdio-roku-service/install` provides install-related functionality if you want to do it manually.

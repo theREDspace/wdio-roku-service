@@ -6,6 +6,7 @@ import { XMLSerializer } from '@xmldom/xmldom';
 import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';
 import { installByID, installFromZip } from './install';
+import { getScreenshot } from './info';
 
 export default class RokuWorkerService implements Services.ServiceInstance {
   async before(config: Options.Testrunner, specs: string[], browser: WebdriverIO.Browser) {
@@ -35,6 +36,24 @@ export default class RokuWorkerService implements Services.ServiceInstance {
         console.error('moveTo is not supported on Roku! You must navigate to the element manually.');
       },
       true,
+    );
+
+    browser.overwriteCommand(
+      'saveScreenshot',
+      async function (original:Function, path:string) {
+        if(!path.endsWith(".jpg")) {
+          console.warn("Screenshot called without .jpg ending. Attempting to change or add file extension.");
+          path = path.split(".")[0] + ".jpg";
+        }
+
+        try {
+          const response = await getScreenshot();
+          writeFileSync(path, Buffer.from(await response.arrayBuffer()));
+        } catch (e:unknown) {
+          console.error("Couldn't get screenshot from Roku!");
+          console.error(e);
+        }
+      }
     );
 
     browser.addCommand('openRokuXML', async function () {

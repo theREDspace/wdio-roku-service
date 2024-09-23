@@ -1,11 +1,11 @@
-import { formatString } from './utils';
+import { formatString, getAuthHeaders } from './utils';
 import { ECP, endpoints } from './ecp';
 
 /**
  * Returns the app icon for the channel ID specified.
  *
  * @param channelId - The ID of the channel you want to query.
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP, which if successful, should be the binary data of the image, with the MIME type in the headers
  */
 export const getAppIcon = (channelId: string) => {
   const uri = formatString(endpoints['icon'], channelId);
@@ -16,7 +16,7 @@ export const getAppIcon = (channelId: string) => {
 /**
  * Returns the device info object for your current device.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querydevice-info-example}
  */
 export const getDeviceInfo = () => {
   return ECP(endpoints['device'], 'GET');
@@ -25,7 +25,7 @@ export const getDeviceInfo = () => {
 /**
  * Returns the player info object for your current device.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querymedia-player-example}
  */
 export const getPlayer = () => {
   return ECP(endpoints['player'], 'GET');
@@ -34,44 +34,60 @@ export const getPlayer = () => {
 /**
  * Returns the app UI object for your current device.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP, which if successful, should be the current UI in XML form
  */
 export const getAppUI = () => {
-  return ECP(endpoints['appUI'], 'GET');
+  return ECP(endpoints.appUI, 'GET');
 };
 
 /**
  * Returns the active app object for your current device.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querytv-active-channel-example}
  */
 export const getActiveApp = () => {
-  return ECP(endpoints['activeApp'], 'GET');
+  return ECP(endpoints.activeApp, 'GET');
 };
 
 /**
  * Returns the installed apps object for your current device.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querytv-channels-example}
  */
 export const getApps = () => {
-  return ECP(endpoints['apps'], 'GET');
+  return ECP(endpoints.apps, 'GET');
 };
 
 /**
  * Returns the All Nodes object from the SceneGraph Nodes endpoint.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#query-debugging-examples}
  */
 export const getSGNodes = async () => {
-  return ECP(endpoints['sgnodes'], 'GET');
+  return ECP(endpoints.sgnodes, 'GET');
 };
 
 /**
  * Returns orphaned SceneGraph Nodes.
  *
- * @returns Promise<any> TODO: return better types for ECP
+ * @returns The response from the ECP, which if successful, should be a list of every node without a parent
  */
 export const getSGOrphans = async () => {
-  return ECP(endpoints['sgnodesroot'], 'GET');
+  return ECP(endpoints.sgnodesroot, 'GET');
+};
+
+/**
+ * Take a screenshot of the Roku's screen
+ * @returns The response from the ECP
+ */
+export const getScreenshot = async (): Promise<Response> => {
+  const headers = await getAuthHeaders(endpoints['screenshot'], 'POST');
+  if (headers === undefined) throw new Error("getAuthHeaders failed!");
+
+  const form = new FormData();
+  form.append('mysubmit', 'Screenshot');
+
+  const response: Response = (await ECP(endpoints['screenshot'], 'GET', false, form, headers)) as Response;
+  if (response.status !== 200) throw new Error("ECP call failed for screenshot!");
+  return response;
 };

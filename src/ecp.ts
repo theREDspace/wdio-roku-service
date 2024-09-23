@@ -9,18 +9,19 @@ export const endpoints = {
   appUI: 'query/app-ui',
   activeApp: 'query/active-app',
   apps: 'query/apps',
-  install: 'install/%s',
-  launch: 'launch/%s?contentId=%s&mediaType=%s',
-  icon: 'query/icon/%s',
-  device: 'query/device-info',
-  keypress: 'keypress/%s',
-  keydown: 'keydown/%s',
-  keyup: 'keyup/%s',
-  player: 'query/media-player',
-  input: 'input?',
-  load: '/plugin_install',
-  exit: 'exit-app',
   channelState: 'query/channel-state/%s',
+  device: 'query/device-info',
+  exit: 'exit-app',
+  icon: 'query/icon/%s',
+  input: 'input?',
+  install: 'install/%s',
+  keydown: 'keydown/%s',
+  keypress: 'keypress/%s',
+  keyup: 'keyup/%s',
+  launch: 'launch/%s?contentId=%s&mediaType=%s',
+  load: '/plugin_install',
+  player: 'query/media-player',
+  screenshot: '/plugin_inspect',
   sgnodes: 'query/sgnodes/all',
   sgnodesroot: 'query/sgnodes/roots',
 };
@@ -28,11 +29,11 @@ export const endpoints = {
 /**
  * Sends an HTTP request to a Roku device.
  *
- * @param uri - The request uri to send to the device. Use the endpoints object below to specify values for this.
+ * @param uri - The request uri to send to the device. Use the endpoints object to specify values for this.
  * @param method - The request method to send ("GET", "POST", etc).
  * @param ecp - This deterines whether to use port 8060 or not. Default is true.
  * @param body - Optional. The request body to send.
- * @param headers - The request headers to send.
+ * @param headers - Optional. The request headers to send.
  * @returns The response from the request, often an xml Document
  */
 export const ECP = async (

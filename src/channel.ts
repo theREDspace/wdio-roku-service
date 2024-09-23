@@ -33,7 +33,7 @@ export const launchChannel = (
 /**
  * Sends custom events to the current application.
  *
- * @param params - An object containing key/value pairs. Will be appended as query params to the ECP request url.
+ * @param params - An object containing key/value pairs. Will be appended as query params to the ECP request url. {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#input-examples}
  * @returns The response from the ECP
  */
 export const inputChannel = (params: object): Promise<Response | Document> => {
