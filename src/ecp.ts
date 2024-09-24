@@ -1,7 +1,3 @@
-import { DOMParser } from '@xmldom/xmldom';
-import type { Document } from '@xmldom/xmldom';
-const parser = new DOMParser();
-
 /**
  * All the possible ECP endpoints, use the formatString function to replace the string placeholders when it's time to make a request.
  */
@@ -12,6 +8,7 @@ export const endpoints = {
   channelState: 'query/channel-state/%s',
   device: 'query/device-info',
   exit: 'exit-app',
+  frameRate: 'query/graphics-frame-rate',
   icon: 'query/icon/%s',
   input: 'input?',
   install: 'install/%s',
@@ -20,10 +17,12 @@ export const endpoints = {
   keyup: 'keyup/%s',
   launch: 'launch/%s?contentId=%s&mediaType=%s',
   load: 'plugin_install',
+  performance: 'query/chanperf',
   player: 'query/media-player',
   screenshot: 'plugin_inspect',
   sgnodes: 'query/sgnodes/all',
   sgnodesroot: 'query/sgnodes/roots',
+  textureMemory: 'query/r2d2-bitmaps',
 };
 
 /**
@@ -34,7 +33,7 @@ export const endpoints = {
  * @param ecp - This deterines whether to use port 8060 or not. Default is true.
  * @param body - Optional. The request body to send.
  * @param headers - Optional. The request headers to send.
- * @returns The response from the request, often an xml Document
+ * @returns The response from the request, often xml
  */
 export const ECP = async (
   uri: string,
@@ -42,25 +41,10 @@ export const ECP = async (
   ecp: boolean = true,
   body?: string | FormData | undefined,
   headers?: Record<string, string>,
-): Promise<Response | Document> => {
+) => {
   const url = ecp ? `http://${process.env.ROKU_IP}:8060` : `http://${process.env.ROKU_IP}`;
   const req: Request = new Request(`${url}/${uri}`);
   const options: RequestInit =
     headers === undefined ? { method: method, body: body } : { method: method, body: body, headers: headers };
-  const response = await fetch(req, options);
-
-  // If we've hit here, we've called getAuthHeader, return the response body to the function.
-  if (response.headers.get('WWW-Authenticate') !== null) return response;
-  // If the body is form-data, return the response body as-is.
-  if (body instanceof FormData) return response;
-  // If we get to here, we're pretty sure it's xml from the Roku.
-  const xml = await response.text();
-  const doc = parser.parseFromString(xml, 'text/xml');
-  const errorNodes = doc.getElementsByTagName('parsererror');
-  if (errorNodes.length > 0) {
-    console.error(errorNodes[0]);
-    throw new Error(`ECP ${method} request for ${uri} returned an error`);
-  } else {
-    return doc;
-  }
+  return fetch(req, options);
 };

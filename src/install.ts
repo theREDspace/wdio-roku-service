@@ -11,7 +11,7 @@ import * as fs from 'fs';
  */
 export const installByID = async (channelId: string): Promise<boolean> => {
   try {
-    const uri = formatString(endpoints['install'], channelId);
+    const uri = formatString(endpoints.install, channelId);
     await ECP(uri, 'POST');
     await sleep(1000);
     await launchChannel(channelId);

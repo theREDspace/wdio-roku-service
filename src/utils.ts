@@ -1,6 +1,5 @@
 import { ECP, endpoints } from './ecp';
 import { createHash, randomBytes } from 'crypto';
-import type { Document } from '@xmldom/xmldom';
 
 /**
  * Allows for implicit wait in tests.
@@ -15,7 +14,7 @@ export const sleep = (ms: number) => {
 /**
  * Replaces the instances of %s in the given string with the provided arguments.
  * If there are more %s than arguments, the latter ones will be removed.
- * 
+ *
  * @param template The string to replace placeholders within
  * @param args The strings to replace the placeholders with
  * @returns The formatted string
@@ -30,12 +29,11 @@ export const formatString = (template: string, ...args: string[]): string => {
  * @returns Whether the app is now ready
  */
 export const waitForAppReady = async (retries: number): Promise<boolean> => {
-  let status: string | null | undefined;
   while (true) {
     let counter: number = 0;
-    const ui = (await ECP(endpoints['appUI'], 'GET')) as Document;
-    status = ui.getElementsByTagName('status')[0]?.childNodes[0]?.nodeValue;
-    if (status === 'OK') break;
+    const response = await ECP(endpoints.appUI, 'GET');
+    const ui = await response.text();
+    if (ui.indexOf('<status>FAILED</status>') < 0) return true;
     counter++;
     if (counter < retries) {
       await sleep(5000);
@@ -43,7 +41,7 @@ export const waitForAppReady = async (retries: number): Promise<boolean> => {
       break;
     }
   }
-  return status === 'OK' ? true : false;
+  return false;
 };
 
 /**
@@ -65,7 +63,7 @@ export const getAuthHeaders = async (uri: string, method: string): Promise<Recor
     'Authorization': auth,
     'Content-Type': 'application/json',
   };
-  const response: Response = (await ECP(uri, method, false, formData, headers)) as Response;
+  const response = await ECP(uri, method, false, formData, headers);
   if (response.status !== 200) return undefined;
   return headers;
 };
@@ -81,7 +79,7 @@ export const getAuthHeaders = async (uri: string, method: string): Promise<Recor
 const createDigest = async (uri: string, method: string) => {
   try {
     const response = await ECP(uri, method, false);
-    const digest = digestParts(response as Response);
+    const digest = digestParts(response);
     digest.set('uri', uri);
     digest.set('method', method);
     digest.set('username', process.env.ROKU_USER ?? 'rokudev');

@@ -29,7 +29,7 @@ export const enum Buttons {
  * @returns Whether the input succeeded.
  */
 export const keyDown = async (key: string) => {
-  const uri: string = formatString(endpoints['keydown'], key);
+  const uri = formatString(endpoints.keydown, key);
   return ECP(uri, 'POST');
 };
 
@@ -40,7 +40,7 @@ export const keyDown = async (key: string) => {
  * @returns Whether the input succeeded.
  */
 export const keyUp = async (key: string) => {
-  const uri: string = formatString(endpoints['keyup'], key);
+  const uri = formatString(endpoints.keyup, key);
   return ECP(uri, 'POST');
 };
 
@@ -51,7 +51,7 @@ export const keyUp = async (key: string) => {
  * @returns Whether the input succeeded.
  */
 export const keyPress = async (key: string) => {
-  const uri: string = formatString(endpoints['keypress'], key);
+  const uri = formatString(endpoints.keypress, key);
   return ECP(uri, 'POST');
 };
 
@@ -65,7 +65,7 @@ export const keySequence = async (keys: string[]): Promise<boolean> => {
   for (const key of keys) {
     try {
       await keyPress(key);
-      await sleep(500);
+      await sleep(100);
     } catch {
       return false;
     }
@@ -82,6 +82,6 @@ export const keySequence = async (keys: string[]): Promise<boolean> => {
  */
 export const keyboardInput = (inputString: string): Promise<boolean> => {
   const chars = inputString.split('');
-  const keys: string[] = chars.map((char) => `Lit_${encodeURIComponent(char)}`);
+  const keys = chars.map((char) => `Lit_${encodeURIComponent(char)}`);
   return keySequence(keys);
 };

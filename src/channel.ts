@@ -1,6 +1,5 @@
 import { ECP, endpoints } from './ecp';
 import { formatString } from './utils';
-import type { Document } from '@xmldom/xmldom';
 
 /**
  * Returns the state object for the channel ID specified.
@@ -9,7 +8,7 @@ import type { Document } from '@xmldom/xmldom';
  * @returns The response from the ECP
  */
 export const getChannelState = (channelId: string) => {
-  const uri = formatString(endpoints['channelState'], channelId);
+  const uri = formatString(endpoints.channelState, channelId);
   return ECP(uri, 'POST');
 };
 
@@ -21,12 +20,8 @@ export const getChannelState = (channelId: string) => {
  * @param mediaType - Optional. The media type of the content you're deeplinking to.
  * @returns The response from the ECP
  */
-export const launchChannel = (
-  channelId: string,
-  contentId: string = '',
-  mediaType: string = '',
-): Promise<Response | Document> => {
-  const uri = formatString(endpoints['launch'], channelId, contentId, mediaType);
+export const launchChannel = (channelId: string, contentId: string = '', mediaType: string = '') => {
+  const uri = formatString(endpoints.launch, channelId, contentId, mediaType);
   return ECP(uri, 'POST');
 };
 
@@ -36,8 +31,8 @@ export const launchChannel = (
  * @param params - An object containing key/value pairs. Will be appended as query params to the ECP request url. {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#input-examples}
  * @returns The response from the ECP
  */
-export const inputChannel = (params: object): Promise<Response | Document> => {
-  let uri = `${endpoints['input']}`;
+export const inputChannel = (params: object) => {
+  let uri = `${endpoints.input}`;
   Object.entries(params).forEach((param) => {
     uri = uri + encodeURIComponent(param[0]) + '=' + encodeURIComponent(param[1]) + '&';
   });
@@ -51,6 +46,6 @@ export const inputChannel = (params: object): Promise<Response | Document> => {
  *
  * @returns The response from the ECP
  */
-export const exitChannel = (): Promise<Response | Document> => {
-  return ECP(endpoints['exit'], 'GET');
+export const exitChannel = () => {
+  return ECP(endpoints.exit, 'GET');
 };

@@ -8,7 +8,7 @@ import { ECP, endpoints } from './ecp';
  * @returns The response from the ECP, which if successful, should be the binary data of the image, with the MIME type in the headers
  */
 export const getAppIcon = (channelId: string) => {
-  const uri = formatString(endpoints['icon'], channelId);
+  const uri = formatString(endpoints.icon, channelId);
   // TODO: Decode the image and return it to mimic automated-channel-testing.
   return ECP(uri, 'GET');
 };
@@ -19,7 +19,7 @@ export const getAppIcon = (channelId: string) => {
  * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querydevice-info-example}
  */
 export const getDeviceInfo = () => {
-  return ECP(endpoints['device'], 'GET');
+  return ECP(endpoints.device, 'GET');
 };
 
 /**
@@ -28,7 +28,7 @@ export const getDeviceInfo = () => {
  * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#querymedia-player-example}
  */
 export const getPlayer = () => {
-  return ECP(endpoints['player'], 'GET');
+  return ECP(endpoints.player, 'GET');
 };
 
 /**
@@ -82,12 +82,12 @@ export const getSGOrphans = async () => {
  */
 export const getScreenshot = async (): Promise<Response> => {
   const headers = await getAuthHeaders(endpoints.screenshot, 'POST');
-  if (headers === undefined) throw new Error("getAuthHeaders failed!");
+  if (headers === undefined) throw new Error('getAuthHeaders failed!');
 
   const form = new FormData();
   form.append('mysubmit', 'Screenshot');
 
-  const response: Response = (await ECP(endpoints.screenshot, 'GET', false, form, headers)) as Response;
-  if (response.status !== 200) throw new Error("ECP call failed for screenshot!");
+  const response = await ECP(endpoints.screenshot, 'GET', false, form, headers);
+  if (response.status !== 200) throw new Error('ECP call failed for screenshot!');
   return response;
 };
