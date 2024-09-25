@@ -72,10 +72,21 @@ export default class RokuWorkerService implements Services.ServiceInstance {
       return this.url(`file://${output.name}`);
     });
 
-    if (process.env.ROKU_CHANNEL_ID) {
-      await installByID(process.env.ROKU_CHANNEL_ID);
-    } else if (process.env.ROKU_APP_PATH) {
+    browser.overwriteCommand(
+      'waitUntil',
+      async function (this: WebdriverIO.Browser, origWaitFunction: Function, condition: Function, options: object) {
+        const loadThenCheck = async () => {
+          await this.openRokuXML();
+          return condition();
+        };
+        origWaitFunction(loadThenCheck, options);
+      },
+    );
+
+    if (process.env.ROKU_APP_PATH) {
       await installFromZip(process.env.ROKU_APP_PATH);
+    } else if (process.env.ROKU_CHANNEL_ID) {
+      await installByID(process.env.ROKU_CHANNEL_ID);
     }
   }
 }

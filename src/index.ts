@@ -5,7 +5,7 @@ export default RokuWorkerService;
 declare global {
   namespace WebdriverIO {
     interface Browser {
-      loadRokuXML: () => Promise<void | WebdriverIO.Request>;
+      openRokuXML: () => Promise<void | WebdriverIO.Request>;
     }
   }
   namespace NodeJS {

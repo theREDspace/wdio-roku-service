@@ -1,6 +1,15 @@
 import { ECP, endpoints } from './ecp';
 import { formatString } from './utils';
 
+export const enum MediaType {
+  SERIES = 'series',
+  SEASON = 'season',
+  EPISODE = 'episode',
+  MOVIE = 'movie',
+  SHORT = 'shortFormVideo',
+  SPECIAL = 'tvSpecial',
+}
+
 /**
  * Returns the state object for the channel ID specified.
  *
@@ -18,10 +27,23 @@ export const getChannelState = (channelId: string) => {
  * @param channelId - The channel ID of the Roku app you want to install.
  * @param contentId - Optional. The content ID of the content within the app you want to deeplink to.
  * @param mediaType - Optional. The media type of the content you're deeplinking to.
+ * @param queryParams - Optional. Additional arguments to send to the app.
  * @returns The response from the ECP
  */
-export const launchChannel = (channelId: string, contentId: string = '', mediaType: string = '') => {
-  const uri = formatString(endpoints.launch, channelId, contentId, mediaType);
+export const launchChannel = (
+  channelId: string,
+  contentId: string = '',
+  mediaType: string = '',
+  queryParams?: object,
+) => {
+  let uri = formatString(endpoints.launch, channelId, contentId, mediaType);
+
+  if (queryParams) {
+    Object.entries(queryParams).forEach((param) => {
+      uri = uri + encodeURIComponent(param[0]) + '=' + encodeURIComponent(param[1]) + '&';
+    });
+  }
+
   return ECP(uri, 'POST');
 };
 
