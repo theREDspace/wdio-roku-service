@@ -45,7 +45,6 @@
     },
     "dependencies": {
         "@wdio/globals": "^9.0.9",
-        "@wdio/logger": "^9.0.8",
         "tmp": "^0.2.3",
         "webdriverio": "^9.0.9"
     },

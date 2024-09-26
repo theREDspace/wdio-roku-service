@@ -74,17 +74,22 @@ export default class RokuWorkerService implements Services.ServiceInstance {
 
     browser.overwriteCommand(
       'waitUntil',
-      async function (this: WebdriverIO.Browser, origWaitFunction: Function, condition: ()=>unknown, options: WaitUntilOptions) {
+      async function (
+        this: WebdriverIO.Browser,
+        origWaitFunction: Function,
+        condition: () => unknown,
+        options: WaitUntilOptions,
+      ) {
         if (typeof condition !== 'function') {
           throw new Error('Condition is not a function');
         }
-        
+
         const loadThenCheck = async () => {
           await this.openRokuXML();
           return condition();
         };
-        
-        origWaitFunction(loadThenCheck.bind(this), options);
+
+        return origWaitFunction(loadThenCheck.bind(this), options);
       },
     );
 

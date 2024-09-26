@@ -2,7 +2,7 @@ import { formatString, getAuthHeaders } from './utils';
 import { ECP, endpoints } from './ecp';
 
 /**
- * Returns the app icon for the channel ID specified.
+ * Returns the app icon for the specified channel ID.
  *
  * @param channelId - The ID of the channel you want to query.
  * @returns The response from the ECP, which if successful, should be the binary data of the image, with the MIME type in the headers
@@ -34,7 +34,7 @@ export const getPlayer = () => {
 /**
  * Returns the app UI object for your current device.
  *
- * @returns The response from the ECP, which if successful, should be the current UI in XML form
+ * @returns The response from the ECP, which if successful, should contain the current UI in XML form
  */
 export const getAppUI = () => {
   return ECP(endpoints.appUI, 'GET');
@@ -78,7 +78,7 @@ export const getSGOrphans = async () => {
 
 /**
  * Take a screenshot of the Roku's screen
- * @returns The response from the ECP
+ * @returns The response from the ECP, which should contain the image in jpg formatting.
  */
 export const getScreenshot = async (): Promise<Response> => {
   const headers = await getAuthHeaders(endpoints.screenshot, 'POST');

@@ -19,6 +19,7 @@ export const enum Buttons {
   INFO = 'Info',
   BACKSPACE = 'Backspace',
   SEARCH = 'Search',
+  /** Used to finalize input fields. */
   ENTER = 'Enter',
 }
 
@@ -26,7 +27,7 @@ export const enum Buttons {
  * Sends a key down command to the Roku.
  *
  * @param key - The controller button to hold.
- * @returns Whether the input succeeded.
+ * @returns The response from the ECP (if successful, the response body will be empty)
  */
 export const keyDown = async (key: string) => {
   const uri = formatString(endpoints.keydown, key);
@@ -37,7 +38,7 @@ export const keyDown = async (key: string) => {
  * Sends a key up command to the Roku.
  *
  * @param key - The controller button to release.
- * @returns Whether the input succeeded.
+ * @returns The response from the ECP (if successful, the response body will be empty)
  */
 export const keyUp = async (key: string) => {
   const uri = formatString(endpoints.keyup, key);
@@ -48,7 +49,7 @@ export const keyUp = async (key: string) => {
  * Sends a key press command to the Roku.
  *
  * @param key - The controller button to press (key down then key up).
- * @returns Whether the input succeeded.
+ * @returns The response from the ECP (if successful, the response body will be empty)
  */
 export const keyPress = async (key: string) => {
   const uri = formatString(endpoints.keypress, key);
@@ -64,7 +65,8 @@ export const keyPress = async (key: string) => {
 export const keySequence = async (keys: string[]): Promise<boolean> => {
   for (const key of keys) {
     try {
-      await keyPress(key);
+      const response = await keyPress(key);
+      if (!response.ok) return false;
       await sleep(100);
     } catch {
       return false;
@@ -75,7 +77,7 @@ export const keySequence = async (keys: string[]): Promise<boolean> => {
 
 /**
  * Converts a string into keyboard presses and sends them to the Roku.
- * Use keyPress(Buttons.Enter) to complete the entry field.
+ * Use keyPress(Buttons.ENTER) to complete the entry field.
  *
  * @param inputString The string to enter using the keyboard
  * @returns Whether all the keypresses succeeded.

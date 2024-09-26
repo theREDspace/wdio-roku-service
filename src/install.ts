@@ -4,7 +4,7 @@ import { sleep, formatString, waitForAppReady, getAuthHeaders } from './utils';
 import * as fs from 'fs';
 
 /**
- * Installs a Roku channel by its ID. Can use to install without a zip.
+ * Installs a Roku channel by its ID. Can be used to install without a zip.
  *
  * @param channelId - The channel ID of the Roku app you want to install.
  * @returns Whether the app is now ready for use
@@ -23,10 +23,10 @@ export const installByID = async (channelId: string): Promise<boolean> => {
 };
 
 /**
- * Sideload a Roku app to a device.
+ * Sideload a Roku app to a device. This can be later accessed through the channel ID 'dev'
  *
  * @param pathToArchive - The path to the archive containing the Roku app to sideload
- * @returns A promise containing a boolean. Indicates whether a sideload has completed successfully or not.
+ * @returns Whether the app is now ready to use.
  */
 export const installFromZip = async (pathToArchive: string): Promise<boolean> => {
   const headers = await getAuthHeaders(endpoints.load, 'POST');

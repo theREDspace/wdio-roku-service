@@ -13,6 +13,7 @@ capabilities: [{
 }],
 ```
 * Import the `RokuWorkerService` and include it in the `services` of your config. No parameters are required.
+* It's recommended to increase the `waitforInterval` and `waitforTimeout`, as each interval involves downloading the xml from the Roku.
 
 ### .env
 See the .env.example file. Copy it and rename it to .env within your project. You will probably want to put it in your .gitignore as well.
@@ -41,7 +42,7 @@ import { Buttons, keySequence } from "wdio-roku-service/controller";
 await keySequence(Buttons.LEFT, Buttons.LEFT, Buttons.SELECT, Buttons.DOWN, Buttons.SELECT);
 // Fetch the current app UI from the Roku and load it into the browser
 await browser.openRokuXML();
-// use WDIO functionality on the roku XML as if it was a webpage
+// use WDIO matchers on the roku XML as if it was a webpage
 ```
 `wdio-roku-service/controller` also has functions for holding or releasing buttons as well as typing text into a keyboard.
 ```js
@@ -57,11 +58,11 @@ await browser.openRokuXML();
 ```js
 import { exitChannel, launchChannel, MediaType } from "wdio-roku-service/channel";
 await exitChannel();
-await launchChannel(process.env.ROKU_CHANNEL_ID, myContent, MediaType.MOVIE);
+await launchChannel(process.env.ROKU_CHANNEL_ID, myContent, MediaType.MOVIE, {myExtraParameter:true});
 ```
 
 ### Other Functions
 * `wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app.
 * `wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
-* `wdio-roku-service/install` provides install-related functionality if you want to do it manually.
+* `wdio-roku-service/install` provides install-related functionality if you want to do it manually or reset the app.
 * `wdio-roku-service/ecp` is the direct interface with the ECP if you need to do anything highly specific.

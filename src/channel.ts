@@ -34,13 +34,13 @@ export const launchChannel = (
   channelId: string,
   contentId: string = '',
   mediaType: string = '',
-  queryParams?: object,
+  queryParams?: { [key: string]: string | number | boolean },
 ) => {
   let uri = formatString(endpoints.launch, channelId, contentId, mediaType);
 
   if (queryParams) {
     Object.entries(queryParams).forEach((param) => {
-      uri = uri + encodeURIComponent(param[0]) + '=' + encodeURIComponent(param[1]) + '&';
+      uri = `${uri}&${encodeURIComponent(param[0])}=${encodeURIComponent(param[1])}`;
     });
   }
 
@@ -49,11 +49,12 @@ export const launchChannel = (
 
 /**
  * Sends custom events to the current application.
+ * {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#input-examples}
  *
- * @param params - An object containing key/value pairs. Will be appended as query params to the ECP request url. {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#input-examples}
+ * @param params - An object containing key/value pairs. Will be appended as query params to the ECP request url.
  * @returns The response from the ECP
  */
-export const inputChannel = (params: object) => {
+export const inputChannel = (params: { [key: string]: string | number | boolean }) => {
   let uri = `${endpoints.input}`;
   Object.entries(params).forEach((param) => {
     uri = uri + encodeURIComponent(param[0]) + '=' + encodeURIComponent(param[1]) + '&';
@@ -64,7 +65,8 @@ export const inputChannel = (params: object) => {
 };
 
 /**
- * Close/exit a channel. Channel must support Instant Resume to use this and the device must be running at least RokuOS 13.0.
+ * Close/exit a channel. Requires RokuOS 13.0 or higher.
+ * If the channel supports Instant Resume, this will suspend the channel in the background rather than exiting it.
  *
  * @returns The response from the ECP
  */

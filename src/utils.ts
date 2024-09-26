@@ -24,7 +24,7 @@ export const formatString = (template: string, ...args: string[]): string => {
 };
 
 /**
- * Wait for an app to be ready. Indicated by status "OK", otherwise will be "FAILED".
+ * Wait for the app to be ready. Indicated by status "OK", otherwise will be "FAILED".
  *
  * @returns Whether the app is now ready
  */
@@ -49,7 +49,7 @@ export const waitForAppReady = async (retries: number): Promise<boolean> => {
  *
  * @param uri - The Roku ECP uri we're authenticating with.
  * @param method - The request method. Generally, "POST".
- * @returns Promise<Record<string, string>
+ * @returns The Roku authentication headers
  */
 export const getAuthHeaders = async (uri: string, method: string): Promise<Record<string, string> | undefined> => {
   const auth = await createDigest(uri, method);
@@ -74,7 +74,7 @@ export const getAuthHeaders = async (uri: string, method: string): Promise<Recor
  *
  * @param uri - The Roku ECP URI for the path we need to authenticate with.
  * @param method - The request method to use, usually "POST".
- * @returns string
+ * @returns A string representation of the HTTP authentication digest.
  */
 const createDigest = async (uri: string, method: string) => {
   try {
@@ -120,26 +120,26 @@ const digestParts = (response: Response) => {
  * Returns an md5 hashed string of the input.
  *
  * @param input - A string to hash, used for HTTP digest authentication.
- * @returns string
+ * @returns An md5 hashed string of the input.
  */
 const getMD5 = (input: string) => {
   return createHash('md5').update(input).digest('hex');
 };
 
 /**
- * Returns a string containing a random number, used for HTTP digest authentication.
+ * Generates a random number as a string.
  *
- * @returns string
+ * @returns A string containing a random number, used for HTTP digest authentication.
  */
 const getCnonce = () => {
   return randomBytes(8).toString('hex').slice(0, 16);
 };
 
 /**
- * Returns a string containing the entire HTTP authentication digest using hashed values.
+ * Converts a map of digest parts into the full HTTP authentication digest.
  *
  * @param digest - A map containing the digest values to be hashed.
- * @returns string
+ * @returns A string containing the entire HTTP authentication digest using hashed values.
  */
 const getDigestAuth = (digest: Map<string, string>) => {
   const hash1 = getMD5(digest.get('username') + ':' + digest.get('realm') + ':' + digest.get('password'));

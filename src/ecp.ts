@@ -30,10 +30,10 @@ export const endpoints = {
  *
  * @param uri - The request uri to send to the device. Use the endpoints object to specify values for this.
  * @param method - The request method to send ("GET", "POST", etc).
- * @param ecp - This deterines whether to use port 8060 or not. Default is true.
+ * @param ecp - This determines whether to use port 8060 or not. Default is true.
  * @param body - Optional. The request body to send.
  * @param headers - Optional. The request headers to send.
- * @returns The response from the request, often xml
+ * @returns The response from the roku, often an xml body
  */
 export const ECP = async (
   uri: string,
