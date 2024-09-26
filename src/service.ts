@@ -1,5 +1,6 @@
 import type { Options, Services } from '@wdio/types';
 import { SevereServiceError, WaitUntilOptions } from 'webdriverio';
+import { getBrowserObject } from '@wdio/utils';
 import { ECP, endpoints } from './ecp';
 import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';
@@ -14,6 +15,16 @@ export default class RokuWorkerService implements Services.ServiceInstance {
 
     if (!process.env.ROKU_USER || !process.env.ROKU_PW) {
       console.warn('Roku username and password have not been set. Screenshots will not work.');
+    }
+
+    if (config.maxInstances === undefined || config.maxInstances > 1) {
+      console.warn('maxInstances is undefined or greater than one! Unpredictable behaviour will likely result.');
+    }
+
+    if (config.maxInstancesPerCapability === undefined || config.maxInstancesPerCapability > 1) {
+      console.warn(
+        'maxInstancesPerCapability is undefined or greater than one! Unpredictable behaviour will likely result.',
+      );
     }
 
     browser.overwriteCommand(
@@ -89,8 +100,51 @@ export default class RokuWorkerService implements Services.ServiceInstance {
           return condition();
         };
 
-        return origWaitFunction(loadThenCheck.bind(this), options);
+        return origWaitFunction(loadThenCheck, options);
       },
+    );
+
+    // Overwrite waitUntil on Element
+    browser.overwriteCommand(
+      'waitUntil',
+      async function (
+        this: WebdriverIO.Element,
+        origWaitFunction: Function,
+        condition: () => unknown,
+        options: WaitUntilOptions,
+      ) {
+        if (typeof condition !== 'function') {
+          throw new Error('Condition is not a function');
+        }
+
+        const loadThenCheck = async () => {
+          const browser = getBrowserObject(this);
+          await browser.openRokuXML();
+          return condition();
+        };
+
+        return origWaitFunction(loadThenCheck, options);
+      },
+      true,
+    );
+
+    browser.overwriteCommand(
+      'isDisplayed',
+      async function (this: WebdriverIO.Element, original: Function) {
+        if (!this.elementId) {
+          const command = this.parent.$.bind(this.parent);
+          this.elementId = (await command(this.selector as string).getElement()).elementId;
+        }
+
+        if (!this.elementId) {
+          return false;
+        }
+
+        if ((await this.getAttribute('bounds')) === null) return false;
+        if ((await this.getAttribute('visible')) === 'false') return false;
+        return true;
+      },
+      true,
     );
 
     if (process.env.ROKU_APP_PATH) {

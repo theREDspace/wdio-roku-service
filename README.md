@@ -31,12 +31,18 @@ Archive Installation
 * ROKU_APP_PATH: This should be the path to the archive of your Roku app.
 * ROKU_USER and ROKU_PW: Login credentials are needed to install an archive, as well as for taking screenshots.
 
-You can leave both blank if you wish to install the app yourself instead.
+You can leave both blank if you wish to install the app yourself instead. `wdio-roku-service/install` provides install-related functionality.
+```js
+import { installFromZip } from 'wdio-roku-service/install';
 
+async before() {
+    await installFromZip(process.env.ROKU_APP_PATH);
+}
+```
 ## Usage
 `wdio-roku-service/controller` provides the ability to send button presses to the Roku. `keySequence` is the main one, sending several button presses in sequence.
 ```js
-import { Buttons, keySequence } from "wdio-roku-service/controller";
+import { Buttons, keySequence } from 'wdio-roku-service/controller';
 
 // Navigate through the app
 await keySequence(Buttons.LEFT, Buttons.LEFT, Buttons.SELECT, Buttons.DOWN, Buttons.SELECT);
@@ -46,23 +52,31 @@ await browser.openRokuXML();
 ```
 `wdio-roku-service/controller` also has functions for holding or releasing buttons as well as typing text into a keyboard.
 ```js
-import { Buttons, keyboardInput, keyPress, keySequence } from "wdio-roku-service/controller";
+import { Buttons, keyboardInput, keyPress, keySequence } from 'wdio-roku-service/controller';
 
 await keySequence(Buttons.DOWN, Buttons.DOWN, Buttons.SELECT);
-await keyboardInput("example");
+await keyboardInput('example');
 await keyPress(Buttons.ENTER);
 await browser.openRokuXML();
 ```
 
 ### Deeplinking
+`wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app.
 ```js
-import { exitChannel, launchChannel, MediaType } from "wdio-roku-service/channel";
+import { exitChannel, launchChannel, MediaType } from 'wdio-roku-service/channel';
 await exitChannel();
 await launchChannel(process.env.ROKU_CHANNEL_ID, myContent, MediaType.MOVIE, {myExtraParameter:true});
 ```
 
 ### Other Functions
-* `wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app.
 * `wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
-* `wdio-roku-service/install` provides install-related functionality if you want to do it manually or reset the app.
+```js
+import { getAppIcon } from 'wdio-roku-service/info';
+const response = await getAppIcon(process.env.ROKU_CHANNEL_ID);
+console.log(response.headers.get('Content-Type'));
+```
 * `wdio-roku-service/ecp` is the direct interface with the ECP if you need to do anything highly specific.
+```js
+import { ECP } from 'wdio-roku-service/ecp';
+await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST');
+```
