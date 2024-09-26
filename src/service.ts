@@ -1,5 +1,5 @@
 import type { Options, Services } from '@wdio/types';
-import { SevereServiceError } from 'webdriverio';
+import { SevereServiceError, WaitUntilOptions } from 'webdriverio';
 import { ECP, endpoints } from './ecp';
 import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';
@@ -74,12 +74,17 @@ export default class RokuWorkerService implements Services.ServiceInstance {
 
     browser.overwriteCommand(
       'waitUntil',
-      async function (this: WebdriverIO.Browser, origWaitFunction: Function, condition: Function, options: object) {
+      async function (this: WebdriverIO.Browser, origWaitFunction: Function, condition: ()=>unknown, options: WaitUntilOptions) {
+        if (typeof condition !== 'function') {
+          throw new Error('Condition is not a function');
+        }
+        
         const loadThenCheck = async () => {
           await this.openRokuXML();
           return condition();
         };
-        origWaitFunction(loadThenCheck, options);
+        
+        origWaitFunction(loadThenCheck.bind(this), options);
       },
     );
 
