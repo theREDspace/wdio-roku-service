@@ -19,27 +19,41 @@ capabilities: [{
 See the .env.example file. Copy it and rename it to .env within your project. You will probably want to put it in your .gitignore as well.
 
 * ROKU_IP should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
-
-Then, there are two options for installation. The service will do the installation automatically before the tests.
-
-Channel Installation
-
-* ROKU_CHANNEL_ID: Put the channel ID of your Roku here and it will be installed using that. If you're installing with a zip, you can set this to 'dev'.
-
-Archive Installation
-
-* ROKU_APP_PATH: This should be the path to the archive of your Roku app.
 * ROKU_USER and ROKU_PW: Login credentials are needed to install an archive, as well as for taking screenshots.
 
-You can leave both blank if you wish to install the app yourself instead. `wdio-roku-service/install` provides install-related functionality.
+## Usage
+### Installing
+Channel Installation
+This requires your channel to have an assigned ID.
+```js
+import { installByID } from 'wdio-roku-service/install';
+
+async before() {
+    await installByID(process.env.ROKU_CHANNEL_ID);
+}
+```
+
+Archive Installation
 ```js
 import { installFromZip } from 'wdio-roku-service/install';
 
 async before() {
-    await installFromZip(process.env.ROKU_APP_PATH);
+    await installFromZip(process.env.ROKU_ARCHIVE_PATH);
 }
 ```
-## Usage
+
+Pre-Installed Channel
+```js
+import { launchChannel, exitChannel } from 'wdio-roku-service/channel';
+
+async before() {
+    // Close the channel if it's already open. If the channel supports instant resume, this will merely background it
+    await exitChannel();
+    await launchChannel(process.env.ROKU_CHANNEL_ID);
+}
+```
+
+### Testing
 `wdio-roku-service/controller` provides the ability to send button presses to the Roku. `keySequence` is the main one, sending several button presses in sequence.
 ```js
 import { Buttons, keySequence } from 'wdio-roku-service/controller';
@@ -48,8 +62,13 @@ import { Buttons, keySequence } from 'wdio-roku-service/controller';
 await keySequence(Buttons.LEFT, Buttons.LEFT, Buttons.SELECT, Buttons.DOWN, Buttons.SELECT);
 // Fetch the current app UI from the Roku and load it into the browser
 await browser.openRokuXML();
+// Or, use waits, which will repeatedly load the XML until it times out or the condition passes
+await browser.waitUntil(condition);
+await element.waitForDisplayed();
 // use WDIO matchers on the roku XML as if it was a webpage
+expect(element).toHaveAttr('focused');
 ```
+
 `wdio-roku-service/controller` also has functions for holding or releasing buttons as well as typing text into a keyboard.
 ```js
 import { Buttons, keyboardInput, keyPress, keySequence } from 'wdio-roku-service/controller';

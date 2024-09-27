@@ -17,10 +17,6 @@ declare global {
     interface ProcessEnv {
       /** The IP address of the Roku to communicate with. */
       ROKU_IP: string;
-      /** The ID of the channel to test. */
-      ROKU_CHANNEL_ID?: string;
-      /** The location of the zipped archive to install. */
-      ROKU_APP_PATH?: string;
       /** The username to authenticate with for installing or taking screenshots. */
       ROKU_USER?: string;
       /** The password to authenticate with for installing or taking screenshots. */

@@ -46,6 +46,8 @@
     "dependencies": {
         "@wdio/globals": "^9.0.9",
         "@wdio/utils": "^9.1.0",
+        "expect": "^29.7.0",
+        "expect-webdriverio": "^5.0.2",
         "tmp": "^0.2.3",
         "webdriverio": "^9.0.9"
     },
