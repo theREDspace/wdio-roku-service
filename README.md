@@ -24,6 +24,7 @@ See the .env.example file. Copy it and rename it to .env within your project. Yo
 ## Usage
 ### Installing
 Channel Installation
+
 This requires your channel to have an assigned ID.
 ```js
 import { installByID } from 'wdio-roku-service/install';
@@ -34,6 +35,8 @@ async before() {
 ```
 
 Archive Installation
+
+It's recommended to store the path in the .env, especially if you have multiple developers who might have different locations and/or file names.
 ```js
 import { installFromZip } from 'wdio-roku-service/install';
 
@@ -43,13 +46,16 @@ async before() {
 ```
 
 Pre-Installed Channel
+
+If you've already installed the channel yourself prior to testing, you can simply launch it.
 ```js
 import { launchChannel, exitChannel } from 'wdio-roku-service/channel';
 
 async before() {
     // Close the channel if it's already open. If the channel supports instant resume, this will merely background it
     await exitChannel();
-    await launchChannel(process.env.ROKU_CHANNEL_ID);
+    // Using the channel ID of 'dev' will launch the sideloaded application.
+    await launchChannel('dev');
 }
 ```
 
@@ -66,7 +72,7 @@ await browser.openRokuXML();
 await browser.waitUntil(condition);
 await element.waitForDisplayed();
 // use WDIO matchers on the roku XML as if it was a webpage
-expect(element).toHaveAttr('focused');
+await expect(element).toHaveAttr('focused');
 ```
 
 `wdio-roku-service/controller` also has functions for holding or releasing buttons as well as typing text into a keyboard.
@@ -85,16 +91,17 @@ await browser.openRokuXML();
 import { exitChannel, launchChannel, MediaType } from 'wdio-roku-service/channel';
 await exitChannel();
 await launchChannel(process.env.ROKU_CHANNEL_ID, myContent, MediaType.MOVIE, {myExtraParameter:true});
+await expect(MyContent.header).toBeDisplayed();
 ```
 
 ### Other Functions
-* `wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
+`wdio-roku-service/info` provides miscellaneous functionality, such as getting the app icon or orphaned nodes.
 ```js
 import { getAppIcon } from 'wdio-roku-service/info';
 const response = await getAppIcon(process.env.ROKU_CHANNEL_ID);
-console.log(response.headers.get('Content-Type'));
+expect(response.headers.get('Content-Type')).toBe('image/jpg');
 ```
-* `wdio-roku-service/ecp` is the direct interface with the ECP if you need to do anything highly specific.
+`wdio-roku-service/ecp` is the direct interface with the ECP if you need to do anything highly specific.
 ```js
 import { ECP } from 'wdio-roku-service/ecp';
 await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST');

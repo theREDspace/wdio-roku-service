@@ -11,17 +11,7 @@ export default class RokuWorkerService implements Services.ServiceInstance {
     }
 
     if (!process.env.ROKU_USER || !process.env.ROKU_PW) {
-      console.warn('Roku username and password have not been set. Screenshots will not work.');
-    }
-
-    if (config.maxInstances === undefined || config.maxInstances > 1) {
-      console.warn('maxInstances is undefined or greater than one! Unpredictable behaviour will likely result.');
-    }
-
-    if (config.maxInstancesPerCapability === undefined || config.maxInstancesPerCapability > 1) {
-      console.warn(
-        'maxInstancesPerCapability is undefined or greater than one! Unpredictable behaviour will likely result.',
-      );
+      console.warn('Roku username and password have not been set. Screenshots and installation will not work.');
     }
 
     applyBrowserModifications(browser);

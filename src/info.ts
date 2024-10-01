@@ -87,7 +87,7 @@ export const getScreenshot = async (): Promise<Response> => {
   const form = new FormData();
   form.append('mysubmit', 'Screenshot');
 
-  const response = await ECP(endpoints.screenshot, 'GET', false, form, headers);
+  const response = await ECP('/pkgs/dev.jpg', 'GET', false, form, headers);
   if (response.status !== 200) throw new Error('ECP call failed for screenshot!');
   return response;
 };
