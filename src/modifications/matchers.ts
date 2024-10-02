@@ -60,7 +60,7 @@ export function applyMatcherModifications() {
         'toBeClickable',
         actual,
         async (element: WebdriverIO.Element) => {
-          return (await element.isClickable()) === true;
+          return (await element.isDisplayed()) === true;
         },
         'be',
         'clickable',
@@ -232,6 +232,21 @@ export function applyMatcherModifications() {
         options,
       );
     },
+    async toHaveId(
+      actual: WdioElementMaybePromise,
+      value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
+      options: ExpectWebdriverIO.StringOptions = getConfig(),
+    ) {
+      return genericMatcher(
+        this,
+        'toHaveId',
+        actual,
+        expectToHaveAttr.bind(this, 'name', value, options),
+        'have',
+        'id',
+        options,
+      );
+    },
     async toHaveText(
       actual: WdioElementMaybePromise,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
@@ -244,6 +259,24 @@ export function applyMatcherModifications() {
         expectToHaveAttr.bind(this, 'text', value, options),
         'have',
         'text',
+        options,
+      );
+    },
+    async toHaveHTML(
+      actual: WdioElementMaybePromise,
+      value: string | RegExp | ExpectWebdriverIO.PartialMatcher,
+      options: ExpectWebdriverIO.HTMLOptions = getConfig(),
+    ) {
+      return genericMatcher(
+        this,
+        'toHaveHTML',
+        actual,
+        async (element: WebdriverIO.Element) => {
+          const html = await element.getHTML(options);
+          return compareText(html, value, options).result;
+        },
+        'have',
+        'HTML',
         options,
       );
     },
@@ -272,7 +305,7 @@ async function expectToHaveAttr(
 
 /**
  * Wraps up the matcher with wdio hooks and accounts for isNot
- * 
+ *
  * @param context Should be 'this' within a matcher
  * @param name The name of the matcher
  * @param actual The element being matched
@@ -298,7 +331,7 @@ async function genericMatcher(
     options,
   });
 
-  const passing = await element.waitUntil(async () => await check(element) === !context.isNot);
+  const passing = await element.waitUntil(async () => (await check(element)) === !context.isNot);
   let result = {
     el: element,
     pass: passing === true,
@@ -319,7 +352,7 @@ async function genericMatcher(
 
 /**
  * Checks whether the given number matches with the given NumberOptions
- * 
+ *
  * @param actual The number to check
  * @param options The options defining what a passing number is
  * @returns Whether the number fits the options
@@ -350,7 +383,7 @@ const compareNumbers = (actual: number, options: ExpectWebdriverIO.NumberOptions
 
 /**
  * Checks whether the given string matches the expected value considering the given StringOptions
- * 
+ *
  * @param actual The string to check
  * @param expected What the string should match
  * @param param2 Options to apply to the string

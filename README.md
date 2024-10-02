@@ -1,7 +1,10 @@
+# wdio-roku-service
+This service overrides many parts of WebdriverIO to allow them to be used with Roku apps and provides access to the [Roku ECP](https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md) to control the Roku during testing.
+
 ## Requirements
 ### WDIO Config
 Currently, testing is only supported for a single Roku device. The following are required:
-* `maxInstances` and `maxInstancesPerCapability` should be 1. Testing on multiple devices automatically isn't supported.
+* `maxInstances` and `maxInstancesPerCapability` should be 1. Testing on multiple devices automatically isn't supported and will result in duplicated commands getting sent to the Roku.
 * There should only be a single capability. A headless Chromium build is recommended. For example:
 ```js
 capabilities: [{
@@ -20,6 +23,42 @@ See the .env.example file. Copy it and rename it to .env within your project. Yo
 
 * ROKU_IP should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
 * ROKU_USER and ROKU_PW: Login credentials are needed to install an archive, as well as for taking screenshots.
+
+## Changed Functions
+### Browser
+* `waitUntil` will fetch the xml from the Roku at each iteration to check for changes.
+* `saveScreenshot` will download a screenshot of the current screen from the Roku. Notably, these screenshots are in .jpg format, rather than the .png that WebdriverIO usually uses.
+* `openRokuXML` will fetch the xml from the Roku if you need to do it manually rather than with waits.
+
+### Elements
+* All waits are supported in the same way as Browser. `waitForClickable` is mapped to `waitForDisplayed`, and `waitForStable` is mapped to `waitForExist`.
+* `click`, `doubleClick`, and `moveTo` aren't supported. You have to manually navigate the app.
+* `isFocused` will check for an attribute `focused` on the element being true.
+* `isDisplayed` will check for an attribute `bounds` on the element, and that `visible` is not set to false. If `withinViewport` is set, the bounds will be compared against the Roku's screen size.
+* `getSize` and `getLocation` take the values from the `bounds` attribute, returning 0 for size and -Infinity for position if it isn't present.
+
+Other functions have not been changed, but many still work as expected.
+
+### Matchers
+Most matchers have been updated to fetch the xml while waiting. Some have slightly different functionality.
+* `toBeDisplayed`, `toBeDisplayedInViewport`, `toBeFocused`, `toBeExisting`, `toBePresent`, `toExist`, `toHaveSize`, `toHaveWidth`, `toHaveHeight`, and `toHaveAttribute` all work as expected, with the changes to Element considered.
+* `toHaveElementProperty` is mapped to `toHaveAttribute`.
+* `toHaveElementClass` checks the `name` attribute of the element.
+* `toHaveId` is mapped to `toHaveElementClass`.
+* `toHaveText` checks the `text` attribute of the element.
+* `toHaveChildren` checks the `children` attribute of the element.
+* `toHaveHTML` will treat the xml as if it were HTML, though is likely not very useful.
+
+The following are not currently supported:
+* `toBeSelected` - Could be supported soon after determining what the xml for selected buttons look like, if there's a difference.
+* `toBeChecked` - Could be supported soon after determining what the xml for checked checkboxes look like, if there's a difference.
+* `toHaveComputedLabel` - If you have an equivalent of this on your Roku elements, check the attribute with `toHaveAttribute`.
+* `toHaveComputedRole` - If you have an equivalent of this on your Roku elements, check the attribute with `toHaveAttribute`.
+* `toHaveHref` - If you have URLs on your Roku elements, check the attribute with `toHaveAttribute`.
+* `toHaveStyle` - The xml elements don't have styles.
+* `toHaveClipboardText` - This isn't known.
+* `toHaveTitle` - The title will be the randomly generated temporary filename of the xml.
+* `toHaveUrl` - The URL will be the path to the xml file on your computer.
 
 ## Usage
 ### Installing
