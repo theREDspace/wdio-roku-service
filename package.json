@@ -2,12 +2,12 @@
     "name": "wdio-roku-service",
     "version": "1.0.0",
     "description": "WebdriverIO service to facilitate Roku testing",
-    "author": "",
-    "homepage": "",
+    "author": "REDspace",
+    "homepage": "https://www.redspace.com",
     "license": "",
-    "main": "",
     "module": "dist/index.js",
     "type": "module",
+    "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf dist/ && tsc"
     },
