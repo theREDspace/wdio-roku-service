@@ -87,7 +87,13 @@ export const getScreenshot = async (): Promise<Response> => {
   const form = new FormData();
   form.append('mysubmit', 'Screenshot');
 
-  const response = await ECP('pkgs/dev.jpg', 'POST', false, form, headers);
-  if (response.status !== 200) throw new Error('ECP call failed for screenshot!');
-  return response;
+  // Tell the roku to take a screenshot
+  const response = await ECP(endpoints.screenshot, 'POST', false, form, headers);
+  if (response.status !== 200) throw new Error('ECP call failed taking screenshot!');
+
+  // Get the screenshot from the roku
+  const screenshotResponse = await ECP('pkgs/dev.jpg', 'GET');
+  if (screenshotResponse.status !== 200) throw new Error('ECP call failed getting screenshot!');
+
+  return screenshotResponse;
 };
