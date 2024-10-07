@@ -63,7 +63,7 @@ export const getAuthHeaders = async (uri: string, method: string): Promise<Recor
     'Authorization': auth,
     'Content-Type': 'application/json',
   };
-  const response = await ECP(uri, method, false, formData, headers);
+  const response = await ECP(uri, method, false, (method === 'GET' ? undefined : formData), headers);
   if (response.status !== 200) return undefined;
   return headers;
 };

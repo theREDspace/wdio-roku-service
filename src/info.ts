@@ -92,7 +92,10 @@ export const getScreenshot = async (): Promise<Response> => {
   if (response.status !== 200) throw new Error('ECP call failed taking screenshot!');
 
   // Get the screenshot from the roku
-  const screenshotResponse = await ECP('pkgs/dev.jpg', 'GET');
+  const screenshotHeaders = await getAuthHeaders('pkgs/dev.jpg', 'GET');
+  if (screenshotHeaders === undefined) throw new Error('getAuthHeaders failed!');
+
+  const screenshotResponse = await ECP('pkgs/dev.jpg', 'GET', false, undefined, screenshotHeaders);
   if (screenshotResponse.status !== 200) throw new Error('ECP call failed getting screenshot!');
 
   return screenshotResponse;
