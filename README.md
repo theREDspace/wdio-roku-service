@@ -2,22 +2,102 @@
 This service overrides many parts of WebdriverIO to allow them to be used with Roku apps and provides access to the [Roku ECP](https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md) to control the Roku during testing.
 
 ## Requirements
+
+### Roku
+A test channel/channel.zip and a Roku device (with Developer Mode enabled) on the same network as your mac.
+
+### WebdriverIO
+This is not a standalone product -- it is used as a WebdriverIO test framework plugin (or Service, in their vernacular). Before using this, you should go through the setup for WDIO by running `npm init wdio@latest`.
+
+When going through the setup steps, so you don't have to navigate all the questions/options, you can just choose the following selections during the init phase:
+- E2E Testing
+- On my local machine
+- Web
+- Chrome
+- Mocha
+- Typescript (Y)
+- autogenerate some test files (Y)
+-- default location
+- page objects (Y)
+-- default location
+- spec reporter
+- additional plugins (N)
+- Visual Testing (N)
+- services (none; in the future, this project be in the list)
+- npm install (Y)
+
+Now that this complete, hop into that repo and link this project to the package:
+
+`npm link path/to/wdio-roku-service --save`
+
 ### WDIO Config
-Currently, testing is only supported for a single Roku device. The following are required:
-* `maxInstances` and `maxInstancesPerCapability` should be 1. Testing on multiple devices automatically isn't supported and will result in duplicated commands getting sent to the Roku.
-* There should only be a single capability. A headless Chromium build is recommended. For example:
+Currently, testing is only supported for a single Roku device. The following config updates are required:
+* `maxInstances` and `maxInstancesPerCapability` should be 1. Testing on multiple devices automatically isn't supported and will result in duplicated commands getting sent to the Roku. There should only be a single capability. 
 ```js
-capabilities: [{
-    maxInstances: 1,
-    browserName: 'chrome',
-    'goog:chromeOptions': {
-        args: ['--headless', '--disable-gpu']
-    }
-}],
+//wdio.conf.js
+export const config: WebdriverIO.Config = {
+
+maxInstances: 1,
+
+    capabilities: [{
+        browserName: 'chrome'
+        // or if you want headless mode:
+        browserName: 'chrome',
+        'goog:chromeOptions': { 
+            args: ['--headless', '--disable-gpu']
+        }
+    }],
+    //...
+}
 ```
 * Import the `RokuWorkerService` and include it in the `services` of your config. No parameters are required.
-* It's recommended to increase the `waitforInterval` and `waitforTimeout`, as each interval involves downloading the xml from the Roku.
+```js
+//wdio.conf.js
+import RokuWorkerService from './node_modules/wdio-roku-service/src'
 
+export const config: WebdriverIO.Config = {
+    services: [[RokuWorkerService]],
+    //...
+}
+```
+* It's recommended to increase the `waitforInterval` and `waitforTimeout`, as each interval involves downloading the xml from the Roku. To get more out of the `browser.debug()` feature, you may also opt to extend your mocha testrunner timeout to 5+ minutes for development room.
+```js
+//wdio.conf.js
+export const config: WebdriverIO.Config = {
+    waitforTimeout: 30000,
+    
+    //optional:
+    mochaOpts: {
+        ui: 'bdd',
+        timeout: 600000
+    },
+    //...
+}
+```
+
+You're ready to write your first test!
+
+```js
+import { installFromZip } from '../../node_modules/wdio-roku-service/src/install.ts'
+import { exitChannel } from '../../node_moduleswdio-roku-service/channel.ts'
+import { Buttons, keyPress, keySequence } from '../../node_modules/wdio-roku-service/src/controller.ts'
+
+describe('first test', () => {
+    before('On the landing screen of the test channel', async () => {
+        await installFromZip(process.env.ROKU_APP_PATH)
+    })
+
+    it('should launch to the homescreen without login', async () => {
+        await $("//LoadingIndicator").waitForDisplayed({ reverse: true })
+        await expect($("//ShubiCarousel")).toBeDisplayed()
+    })
+
+    after('should return to home', async () => {
+        await exitChannel()
+    })
+})
+
+```
 ### .env
 See the .env.example file. Copy it and rename it to .env within your project. You will probably want to put it in your .gitignore as well.
 
