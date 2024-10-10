@@ -1,7 +1,7 @@
 import { ECP, endpoints } from './ecp.js';
 import { formatString } from './utils.js';
 
-export const enum MediaType {
+export enum MediaType {
   SERIES = 'series',
   SEASON = 'season',
   EPISODE = 'episode',

@@ -4,7 +4,7 @@ import { sleep, formatString } from './utils.js';
 /**
  * Controller mapping string enum.
  */
-export const enum Buttons {
+export enum Buttons {
   HOME = 'Home',
   UP = 'Up',
   DOWN = 'Down',
