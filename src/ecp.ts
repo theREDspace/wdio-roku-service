@@ -35,7 +35,7 @@ export const endpoints = {
  * @param headers - Optional. The request headers to send.
  * @returns The response from the roku, often an xml body
  */
-export const ECP = async (
+export const ECP = (
   uri: string,
   method: string,
   ecp: boolean = true,

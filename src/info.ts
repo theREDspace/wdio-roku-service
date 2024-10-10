@@ -63,7 +63,7 @@ export const getApps = () => {
  *
  * @returns The response from the ECP: {@link https://developer.roku.com/en-ca/docs/developer-program/dev-tools/external-control-api.md#query-debugging-examples}
  */
-export const getSGNodes = async () => {
+export const getSGNodes = () => {
   return ECP(endpoints.sgnodes, 'GET');
 };
 
@@ -72,7 +72,7 @@ export const getSGNodes = async () => {
  *
  * @returns The response from the ECP, which if successful, should be a list of every node without a parent
  */
-export const getSGOrphans = async () => {
+export const getSGOrphans = () => {
   return ECP(endpoints.sgnodesroot, 'GET');
 };
 

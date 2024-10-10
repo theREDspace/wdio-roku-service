@@ -5,7 +5,7 @@ import { applyElementModifications } from './modifications/element.js';
 import { applyMatcherModifications } from './modifications/matchers.js';
 
 export default class RokuWorkerService implements Services.ServiceInstance {
-  async before(config: Options.Testrunner, specs: string[], browser: WebdriverIO.Browser) {
+  before(config: Options.Testrunner, specs: string[], browser: WebdriverIO.Browser) {
     if (!process.env.ROKU_IP) {
       throw new SevereServiceError('Roku IP is not set within the environment!');
     }

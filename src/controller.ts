@@ -29,7 +29,7 @@ export enum Buttons {
  * @param key - The controller button to hold.
  * @returns The response from the ECP (if successful, the response body will be empty)
  */
-export const keyDown = async (key: string) => {
+export const keyDown = (key: string) => {
   const uri = formatString(endpoints.keydown, key);
   return ECP(uri, 'POST');
 };
@@ -40,7 +40,7 @@ export const keyDown = async (key: string) => {
  * @param key - The controller button to release.
  * @returns The response from the ECP (if successful, the response body will be empty)
  */
-export const keyUp = async (key: string) => {
+export const keyUp = (key: string) => {
   const uri = formatString(endpoints.keyup, key);
   return ECP(uri, 'POST');
 };
@@ -51,7 +51,7 @@ export const keyUp = async (key: string) => {
  * @param key - The controller button to press (key down then key up).
  * @returns The response from the ECP (if successful, the response body will be empty)
  */
-export const keyPress = async (key: string) => {
+export const keyPress = (key: string) => {
   const uri = formatString(endpoints.keypress, key);
   return ECP(uri, 'POST');
 };
