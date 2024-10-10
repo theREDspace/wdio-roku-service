@@ -1,4 +1,4 @@
-import { ECP, endpoints } from './ecp';
+import { ECP, endpoints } from './ecp.js';
 import { createHash, randomBytes } from 'crypto';
 
 /**
@@ -33,7 +33,10 @@ export const waitForAppReady = async (retries: number): Promise<boolean> => {
     let counter: number = 0;
     const response = await ECP(endpoints.appUI, 'GET');
     const ui = await response.text();
-    if (ui.indexOf('<status>FAILED</status>') < 0) return true;
+    // It's theoretically possible that the user has something that looks like a failed status in their successful scene somewhere, so substring just in case
+    const statusLocation = ui.indexOf('status');
+    const statusText = ui.substring(statusLocation + 6, statusLocation + 15);
+    if (statusText.indexOf('FAILED') < 0) return true;
     counter++;
     if (counter < retries) {
       await sleep(5000);

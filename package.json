@@ -5,8 +5,8 @@
     "author": "REDspace",
     "homepage": "https://www.redspace.com",
     "license": "",
-    "module": "dist/index.js",
     "type": "module",
+    "module": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
         "build": "rm -rf dist/ && tsc"
@@ -19,27 +19,27 @@
     ],
     "exports": {
         ".": {
-            "require": "./dist/index.js",
+            "import": "./dist/index.js",
             "types": "./dist/index.d.ts"
         },
         "./controller": {
-            "require": "./dist/controller.js",
+            "import": "./dist/controller.js",
             "types": "./dist/controller.d.ts"
         },
         "./info": {
-            "require": "./dist/info.js",
+            "import": "./dist/info.js",
             "types": "./dist/info.d.ts"
         },
         "./channel": {
-            "require": "./dist/channel.js",
+            "import": "./dist/channel.js",
             "types": "./dist/channel.d.ts"
         },
         "./ecp": {
-            "require": "./dist/ecp.js",
+            "import": "./dist/ecp.js",
             "types": "./dist/ecp.d.ts"
         },
         "./install": {
-            "require": "./dist/install.js",
+            "import": "./dist/install.js",
             "types": "./dist/install.d.ts"
         }
     },

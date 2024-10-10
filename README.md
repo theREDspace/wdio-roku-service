@@ -225,3 +225,6 @@ expect(response.headers.get('Content-Type')).toBe('image/jpg');
 import { ECP } from 'wdio-roku-service/ecp';
 await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST');
 ```
+
+## Common Gotchas
+* Roku elements have their text in a 'text' attribute, not between their tags. When doing selectors, doing `$('element=Text')` won't work for almost every element. Instead, you'll have to do `$('element[text=Text]')`.

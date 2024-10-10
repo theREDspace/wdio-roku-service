@@ -1,7 +1,7 @@
-import { ECP, endpoints } from '../ecp';
+import { ECP, endpoints } from '../ecp.js';
 import * as tmp from 'tmp';
 import { writeFileSync } from 'fs';
-import { getScreenshot } from '../info';
+import { getScreenshot } from '../info.js';
 import type { WaitUntilOptions } from 'webdriverio';
 
 export function applyBrowserModifications(browser: WebdriverIO.Browser) {

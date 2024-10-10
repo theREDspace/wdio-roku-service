@@ -1,5 +1,5 @@
-import { ECP, endpoints } from './ecp';
-import { sleep, formatString } from './utils';
+import { ECP, endpoints } from './ecp.js';
+import { sleep, formatString } from './utils.js';
 
 /**
  * Controller mapping string enum.

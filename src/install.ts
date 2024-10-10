@@ -1,6 +1,6 @@
-import { ECP, endpoints } from './ecp';
-import { launchChannel } from './channel';
-import { sleep, formatString, waitForAppReady, getAuthHeaders } from './utils';
+import { ECP, endpoints } from './ecp.js';
+import { launchChannel } from './channel.js';
+import { sleep, formatString, waitForAppReady, getAuthHeaders } from './utils.js';
 import * as fs from 'fs';
 
 /**

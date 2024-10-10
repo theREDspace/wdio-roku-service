@@ -1,5 +1,5 @@
-import { formatString, getAuthHeaders } from './utils';
-import { ECP, endpoints } from './ecp';
+import { formatString, getAuthHeaders } from './utils.js';
+import { ECP, endpoints } from './ecp.js';
 
 /**
  * Returns the app icon for the specified channel ID.

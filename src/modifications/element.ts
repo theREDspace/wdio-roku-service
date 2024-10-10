@@ -1,6 +1,6 @@
 import { getBrowserObject } from '@wdio/utils';
 import type { WaitForOptions, WaitUntilOptions } from 'webdriverio';
-import { getDeviceInfo } from '../info';
+import { getDeviceInfo } from '../info.js';
 
 export function applyElementModifications(browser: WebdriverIO.Browser) {
   browser.overwriteCommand(

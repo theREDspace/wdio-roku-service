@@ -1,4 +1,4 @@
-import RokuWorkerService from './service';
+import RokuWorkerService from './service.js';
 
 export default RokuWorkerService;
 

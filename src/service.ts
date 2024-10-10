@@ -1,8 +1,8 @@
 import type { Options, Services } from '@wdio/types';
 import { SevereServiceError } from 'webdriverio';
-import { applyBrowserModifications } from './modifications/browser';
-import { applyElementModifications } from './modifications/element';
-import { applyMatcherModifications } from './modifications/matchers';
+import { applyBrowserModifications } from './modifications/browser.js';
+import { applyElementModifications } from './modifications/element.js';
+import { applyMatcherModifications } from './modifications/matchers.js';
 
 export default class RokuWorkerService implements Services.ServiceInstance {
   async before(config: Options.Testrunner, specs: string[], browser: WebdriverIO.Browser) {
