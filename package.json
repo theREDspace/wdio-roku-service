@@ -9,8 +9,7 @@
     "module": "dist/index.js",
     "types": "dist/index.d.ts",
     "scripts": {
-        "build": "rm -rf dist/ && tsc --removeComments && tsc --declaration --emitDeclarationOnly",
-        "prepare": "husky install"
+        "build": "rm -rf dist/ && tsc --removeComments && tsc --declaration --emitDeclarationOnly"
     },
     "keywords": [
         "webdriverio",
@@ -64,9 +63,5 @@
     },
     "files": [
         "dist/*"
-    ],
-    "lint-staged": {
-        "*.js": "eslint --cache --fix",
-        "*.{js,css,md}": "prettier --write"
-    }
+    ]
 }
