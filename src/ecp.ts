@@ -35,11 +35,11 @@ export const endpoints = {
  * @param headers - Optional. The request headers to send.
  * @returns The response from the roku, often an xml body
  */
-export const ECP = (
+export const ECP = async (
   uri: string,
   method: string,
   ecp: boolean = true,
-  body?: string | FormData | undefined,
+  body?: string | FormData,
   headers?: Record<string, string>,
 ) => {
   const url = ecp ? `http://${process.env.ROKU_IP}:8060` : `http://${process.env.ROKU_IP}`;

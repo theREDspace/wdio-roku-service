@@ -4,15 +4,18 @@ import type { AssertionHookParams } from 'expect-webdriverio';
 type WdioElementMaybePromise = Promise<WebdriverIO.Element> | WebdriverIO.Element;
 
 export function applyMatcherModifications() {
-  //@ts-ignore
+  //@ts-expect-error Listed as necessary in wdio docs
   if (global.expect.expect !== undefined) {
-    //@ts-ignore
+    //@ts-expect-error Listed as necessary in wdio docs
     global.expect = global.expect.expect;
   }
 
   // We need to override all the matchers used so the xml gets fetched each iteration
   expect.extend({
-    async toBeDisplayed(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBeDisplayed(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(
         this,
         'toBeDisplayed',
@@ -25,7 +28,10 @@ export function applyMatcherModifications() {
         options,
       );
     },
-    async toBeEnabled(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBeEnabled(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(
         this,
         'toBeEnabled',
@@ -40,7 +46,7 @@ export function applyMatcherModifications() {
     },
     async toBeDisplayedInViewport(
       actual: WdioElementMaybePromise,
-      options: ExpectWebdriverIO.CommandOptions = getConfig(),
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -54,7 +60,10 @@ export function applyMatcherModifications() {
         options,
       );
     },
-    async toBeClickable(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBeClickable(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(
         this,
         'toBeClickable',
@@ -67,16 +76,28 @@ export function applyMatcherModifications() {
         options,
       );
     },
-    async toBeExisting(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBeExisting(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(this, 'toBeExisting', actual, expectToExist, 'be', 'existing', options);
     },
-    async toBePresent(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBePresent(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(this, 'toBePresent', actual, expectToExist, 'be', 'present', options);
     },
-    async toExist(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toExist(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(this, 'toExist', actual, expectToExist, '', 'exist', options);
     },
-    async toBeFocused(actual: WdioElementMaybePromise, options: ExpectWebdriverIO.CommandOptions = getConfig()) {
+    async toBeFocused(
+      actual: WdioElementMaybePromise,
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
       return genericMatcher(
         this,
         'toBeFocused',
@@ -92,7 +113,7 @@ export function applyMatcherModifications() {
     async toHaveSize(
       actual: WdioElementMaybePromise,
       expected: { width: number; height: number },
-      options: ExpectWebdriverIO.CommandOptions = getConfig(),
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -110,7 +131,7 @@ export function applyMatcherModifications() {
     async toHaveWidth(
       actual: WdioElementMaybePromise,
       expected: number,
-      options: ExpectWebdriverIO.CommandOptions = getConfig(),
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -128,7 +149,7 @@ export function applyMatcherModifications() {
     async toHaveHeight(
       actual: WdioElementMaybePromise,
       expected: number,
-      options: ExpectWebdriverIO.CommandOptions = getConfig(),
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -146,7 +167,7 @@ export function applyMatcherModifications() {
     async toHaveChildren(
       actual: WdioElementMaybePromise,
       expected?: number | ExpectWebdriverIO.NumberOptions,
-      options: ExpectWebdriverIO.CommandOptions = getConfig(),
+      options: ExpectWebdriverIO.CommandOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -174,7 +195,7 @@ export function applyMatcherModifications() {
       actual: WdioElementMaybePromise,
       attribute: string,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -190,7 +211,7 @@ export function applyMatcherModifications() {
       actual: WdioElementMaybePromise,
       attribute: string,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -205,7 +226,7 @@ export function applyMatcherModifications() {
     async toHaveElementClass(
       actual: WdioElementMaybePromise,
       value: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -220,7 +241,7 @@ export function applyMatcherModifications() {
     async toHaveClass(
       actual: WdioElementMaybePromise,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -235,7 +256,7 @@ export function applyMatcherModifications() {
     async toHaveId(
       actual: WdioElementMaybePromise,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -250,7 +271,7 @@ export function applyMatcherModifications() {
     async toHaveText(
       actual: WdioElementMaybePromise,
       value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.StringOptions = getConfig(),
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
@@ -265,14 +286,14 @@ export function applyMatcherModifications() {
     async toHaveHTML(
       actual: WdioElementMaybePromise,
       value: string | RegExp | ExpectWebdriverIO.PartialMatcher,
-      options: ExpectWebdriverIO.HTMLOptions = getConfig(),
+      options: ExpectWebdriverIO.HTMLOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
         this,
         'toHaveHTML',
         actual,
         async (element: WebdriverIO.Element) => {
-          const html = await element.getHTML(options);
+          const html = (await element.getHTML(options)) as string;
           return compareText(html, value, options).result;
         },
         'have',
@@ -332,10 +353,11 @@ async function genericMatcher(
   });
 
   const passing = await element.waitUntil(async () => (await check(element)) === !context.isNot);
-  let result = {
+  const displayName = typeof element.selector === 'string' ? element.selector : '<fn>';
+  const result = {
     el: element,
     pass: passing === true,
-    message: () => `expected ${element.selector} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}`,
+    message: () => `expected ${displayName} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}`,
   };
 
   await options.afterAssertion?.({
@@ -436,7 +458,6 @@ export const compareText = (
     };
   }
 
-  expected = expected as string | RegExp;
   if (expected instanceof RegExp) {
     return {
       value: actual,
