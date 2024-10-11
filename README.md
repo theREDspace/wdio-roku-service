@@ -53,7 +53,7 @@ maxInstances: 1,
 * Import the `RokuWorkerService` and include it in the `services` of your config. No parameters are required.
 ```js
 //wdio.conf.js
-import RokuWorkerService from './node_modules/wdio-roku-service/src'
+import RokuWorkerService from 'wdio-roku-service'
 
 export const config: WebdriverIO.Config = {
     services: [[RokuWorkerService]],
@@ -78,9 +78,9 @@ export const config: WebdriverIO.Config = {
 You're ready to write your first test!
 
 ```js
-import { installFromZip } from '../../node_modules/wdio-roku-service/src/install.ts'
-import { exitChannel } from '../../node_moduleswdio-roku-service/channel.ts'
-import { Buttons, keyPress, keySequence } from '../../node_modules/wdio-roku-service/src/controller.ts'
+import { installFromZip } from 'wdio-roku-service/src/install'
+import { exitChannel } from 'wdio-roku-service/channel'
+import { Buttons, keyPress, keySequence } from 'wdio-roku-service/src/controller'
 
 describe('first test', () => {
     before('On the landing screen of the test channel', async () => {
