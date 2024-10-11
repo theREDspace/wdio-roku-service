@@ -207,6 +207,22 @@ export function applyMatcherModifications() {
         options,
       );
     },
+    async toHaveAttr(
+      actual: WdioElementMaybePromise,
+      attribute: string,
+      value?: string | RegExp | ExpectWebdriverIO.PartialMatcher,
+      options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
+    ) {
+      return genericMatcher(
+        this,
+        'toHaveAttribute',
+        actual,
+        expectToHaveAttr.bind(this, attribute, value, options),
+        'have',
+        'attr',
+        options,
+      );
+    },
     async toHaveElementProperty(
       actual: WdioElementMaybePromise,
       attribute: string,
