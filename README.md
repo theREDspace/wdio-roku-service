@@ -15,7 +15,7 @@ When going through the setup steps, so you don't have to navigate all the questi
 - Web
 - Chrome
 - Mocha
-- Typescript (Y)
+- Typescript [modules works for TS and JS, so choose whichever]
 - autogenerate some test files (Y)
 -- default location
 - page objects (Y)
