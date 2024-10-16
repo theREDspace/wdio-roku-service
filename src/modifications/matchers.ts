@@ -124,8 +124,12 @@ export function applyMatcherModifications() {
           return size.width === expected.width && size.height === expected.height;
         },
         'have',
-        'size',
+        `size w: ${expected.width}, h: ${expected.height}`,
         options,
+        async (element: WebdriverIO.Element) => {
+          const size = await element.getSize();
+          return `w: ${size.width}, h:${size.height}`;
+        }
       );
     },
     async toHaveWidth(
@@ -142,8 +146,12 @@ export function applyMatcherModifications() {
           return size.width === expected;
         },
         'have',
-        'width',
+        `width ${expected}`,
         options,
+        async (element: WebdriverIO.Element) => {
+          const size = await element.getSize();
+          return size.width.toString();
+        },
       );
     },
     async toHaveHeight(
@@ -160,8 +168,12 @@ export function applyMatcherModifications() {
           return size.height === expected;
         },
         'have',
-        'height',
+        `height ${expected}`,
         options,
+        async (element: WebdriverIO.Element) => {
+          const size = await element.getSize();
+          return size.height.toString();
+        },
       );
     },
     async toHaveChildren(
@@ -187,8 +199,14 @@ export function applyMatcherModifications() {
           return compareNumbers(childCount, expected);
         },
         'have',
-        'children',
+        `children`,
         options,
+        async (element: WebdriverIO.Element) => {
+          const children = await element.getAttribute('children');
+          let childCount = 0;
+          if (children) childCount = parseInt(children);
+          return childCount.toString();
+        }
       );
     },
     async toHaveAttribute(
@@ -203,8 +221,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, attribute, value, options),
         'have',
-        'attribute',
+        `attribute ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute(attribute)).toString();
+        }
       );
     },
     async toHaveAttr(
@@ -219,8 +240,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, attribute, value, options),
         'have',
-        'attr',
+        `attr ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute(attribute)).toString();
+        }
       );
     },
     async toHaveElementProperty(
@@ -235,8 +259,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, attribute, value, options),
         'have',
-        'element property',
+        `element property ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute(attribute)).toString();
+        }
       );
     },
     async toHaveElementClass(
@@ -250,8 +277,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, 'name', value, options),
         'have',
-        'element class',
+        `element class ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute('name')).toString();
+        }
       );
     },
     async toHaveClass(
@@ -265,8 +295,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, 'name', value, options),
         'have',
-        'class',
+        `class ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute('name')).toString();
+        }
       );
     },
     async toHaveId(
@@ -280,8 +313,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, 'name', value, options),
         'have',
-        'id',
+        `id ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute('name')).toString();
+        }
       );
     },
     async toHaveText(
@@ -295,8 +331,11 @@ export function applyMatcherModifications() {
         actual,
         expectToHaveAttr.bind(this, 'text', value, options),
         'have',
-        'text',
+        `text ${value ? value.toString() : ''}`,
         options,
+        async (element:WebdriverIO.Element) => {
+          return (await element.getAttribute('text')).toString();
+        }
       );
     },
     async toHaveHTML(
@@ -313,8 +352,12 @@ export function applyMatcherModifications() {
           return compareText(html, value, options).result;
         },
         'have',
-        'HTML',
+        `HTML ${value ? value.toString() : ''}`,
         options,
+        async (element: WebdriverIO.Element) => {
+          const html = (await element.getHTML(options)) as string;
+          return html;
+        },
       );
     },
   });
@@ -360,6 +403,7 @@ async function genericMatcher(
   verb: string,
   expectation: string,
   options: ExpectWebdriverIO.DefaultOptions,
+  getActual?: (element: WebdriverIO.Element) => Promise<string>
 ) {
   const element = await actual;
 
@@ -368,12 +412,25 @@ async function genericMatcher(
     options,
   });
 
-  const passing = await element.waitUntil(async () => (await check(element)) === !context.isNot);
+  let passing:boolean;
+  try {
+    passing = await element.waitUntil(async () => (await check(element)) === !context.isNot) === true;
+  } catch {
+    passing = false;
+  };
+
+  const valid = passing === !context.isNot;
+
   const displayName = typeof element.selector === 'string' ? element.selector : '<fn>';
   const result = {
     el: element,
-    pass: passing === true,
-    message: () => `expected ${displayName} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}`,
+    pass: passing ? !context.isNot : !!context.isNot,
+    message: () => {
+      if (!valid && getActual !== undefined) {
+        return `expected ${displayName} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}, actual: ${getActual(element)}`
+      }
+      return `expected ${displayName} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}`
+    },
   };
 
   await options.afterAssertion?.({

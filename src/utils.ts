@@ -1,5 +1,11 @@
 import { ECP, endpoints } from './ecp.js';
 import { createHash, randomBytes } from 'crypto';
+import debug from 'debug';
+import logger, { type Logger } from '@wdio/logger';
+
+// eslint-disable-next-line
+const d:debug.Debugger = debug('wdio-roku-service');
+const l = logger('roku-service');
 
 /**
  * Allows for implicit wait in tests.
@@ -21,6 +27,20 @@ export const sleep = (ms: number) => {
  */
 export const formatString = (template: string, ...args: string[]): string => {
   return template.replace(/%s/g, () => args.shift() || '');
+};
+
+/**
+ * Logs the given message to both WDIO and debug
+ * 
+ * @param message The message to log.
+ */
+export const log: Logger = {
+  ...l,
+  debug: (message:string) => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+    d(message);
+    l.debug(message);
+  },
 };
 
 /**

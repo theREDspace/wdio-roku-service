@@ -1,3 +1,5 @@
+import { log } from './utils.js'
+
 /**
  * All the possible ECP endpoints, use the formatString function to replace the string placeholders when it's time to make a request.
  */
@@ -46,5 +48,8 @@ export const ECP = async (
   const req: Request = new Request(`${url}/${uri}`);
   const options: RequestInit =
     headers === undefined ? { method: method, body: body } : { method: method, body: body, headers: headers };
-  return fetch(req, options);
+  log.debug(`Sending ECP request to ${url}/${uri}.`);
+  const response = await fetch(req, options);
+  log.debug(`ECP request returned with code ${response.status}.`)
+  return response;
 };
