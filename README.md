@@ -142,12 +142,7 @@ The following are not currently supported:
 * `toHaveUrl` - The URL will be the path to the xml file on your computer.
 
 ## Usage
-<<<<<<< HEAD
 ### Channel Installation
-=======
-### Installing
-Channel Installation
->>>>>>> 1323c03 (migrating from bitbucket)
 
 This requires your channel to have an assigned ID.
 ```js
