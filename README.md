@@ -99,7 +99,7 @@ describe('first test', () => {
 
 ```
 ### .env
-See the .env.example file. Copy it and rename it to .env within your WebdriverIO project that uses this service. You will probably want to put it in your .gitignore as well.
+See the `.env.example` file. Copy it and rename it to `.env` within your WebdriverIO project that uses this service. You will probably want to put it in your .gitignore as well.
 
 * `ROKU_IP` should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
 * `ROKU_USER` and `ROKU_PW`: Login credentials are needed to install an archive, as well as for taking screenshots.
