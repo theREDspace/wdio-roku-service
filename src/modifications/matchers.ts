@@ -386,8 +386,8 @@ async function expectToHaveAttr(
 function attributeExpectation(expectation:string, value?:string | RegExp | PartialMatcher) {
   if (value === undefined) return expectation;
   let valueString = value.toString();
-  if (isStringContainingMatcher(valueString)) {
-    valueString = (value as PartialMatcher).sample;
+  if (isStringContainingMatcher(value)) {
+    valueString = value.sample;
   }
   return `${expectation} as ${valueString}`;
 }
