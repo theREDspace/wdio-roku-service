@@ -99,10 +99,10 @@ describe('first test', () => {
 
 ```
 ### .env
-See the `.env.example` file. Copy it and rename it to `.env` within your WebdriverIO project that uses this service. You will probably want to put it in your `.gitignore` as well.
+See the .env.example file. Copy it and rename it to .env within your project. You will probably want to put it in your .gitignore as well.
 
-* `ROKU_IP` should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
-* `ROKU_USER` and `ROKU_PW`: Login credentials are needed to install an archive, as well as for taking screenshots.
+* ROKU_IP should be the IP of your Roku. The commands will use this IP to communicate with it. This is required.
+* ROKU_USER and ROKU_PW: Login credentials are needed to install an archive, as well as for taking screenshots.
 
 ## Changed Functions
 ### Browser
@@ -141,7 +141,12 @@ The following are not currently supported:
 * `toHaveUrl` - The URL will be the path to the xml file on your computer.
 
 ## Usage
+<<<<<<< HEAD
 ### Channel Installation
+=======
+### Installing
+Channel Installation
+>>>>>>> 1323c03 (migrating from bitbucket)
 
 This requires your channel to have an assigned ID.
 ```js
