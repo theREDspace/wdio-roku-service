@@ -372,7 +372,7 @@ async function genericMatcher(
   const displayName = typeof element.selector === 'string' ? element.selector : '<fn>';
   const result = {
     el: element,
-    pass: passing === true,
+    pass: (passing === true) ? !context.isNot : !!context.isNot,
     message: () => `expected ${displayName} to ${context.isNot ? 'not ' : ''}${verb} ${expectation}`,
   };
 
