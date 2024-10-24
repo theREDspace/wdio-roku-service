@@ -26,9 +26,9 @@ When going through the setup steps, so you don't have to navigate all the questi
 - services (none; in the future, this project be in the list)
 - npm install (Y)
 
-Now that this complete, hop into that repo and link this project to the package:
+Add this package to the project:
 
-`npm link path/to/wdio-roku-service --save`
+`npm i wdio-roku-service --save-dev`
 
 ### WDIO Config
 Currently, testing is only supported for a single Roku device. The following config updates are required:
@@ -98,6 +98,20 @@ describe('first test', () => {
 })
 
 ```
+
+It's also encouraged that you make use of the `browser.debug()` feature in wdio to halt your test for debugging and test authoring:
+
+```js
+// ...
+    it('should launch to the homescreen without login', async () => {
+        await $("//LoadingIndicator").waitForDisplayed({ reverse: true })
+        await expect($("//ShubiCarousel")).toBeDisplayed()
+        await browser.debug()
+        // the test halts, a REPL becomes available for commands
+
+```
+If chrome is not headless, you can see the last time that `openRokuXML()` was called (likely through a `waitForX` or `expect`). using the REPL in your terminal, you can make use of any valid `$` commands, and a couple key custom ones added (`browser.openRokuXML()` and `browser.saveScreenshot('path/to/ss.jpg')`) -- the `controller` class is not attached to the `browser` object, so you can't currently use those. Luckily, you're probably sitting next to the Roku and have a remote you can use to navigate and occasionally call `browser.openRokuXML()` to see what happened to the page state! And remember that XML works natively with xpathing in the chrome browser itself, so you can evaluate/develop your selectors directly in the chrome console during debug.
+
 ### .env
 See the `.env.example` file. Copy it and rename it to `.env` within your WebdriverIO project that uses this service. You will probably want to put it in your .gitignore as well.
 
@@ -228,3 +242,8 @@ await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST'
 
 ## Common Gotchas
 * Roku elements have their text in a 'text' attribute, not between their tags. When doing selectors, doing `$('element=Text')` won't work for almost every element. Instead, you'll have to do `$('element[text=Text]')`.
+
+## Feature Roadmap
+* There will be a PR submitted soon that allows for this service to be installed during the `npm init wdio@latest` questionnaire.
+* Currently evaluating Socket communication with the Roku such that more features can be tooled, such as a means to wake a sleeping Roku.
+* Network proxy feature(s) that allow for keying off of network activity.
