@@ -248,7 +248,7 @@ await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST'
 * Currently evaluating Socket communication with the Roku such that more features can be tooled, such as a means to wake a sleeping Roku.
 * Network proxy feature(s) that allow for keying off of network activity.
 
-## Leveraging the Allure Reporting with attached Screenshots and XML files.
+## Leveraging the Allure Reporting with attached Screenshots and XML files
 
 Out of the box, Allure Reporting does not have a configuration in place to generate screenshots of the app or a copy of the XML code representative of the current state of the Roku app at any point of the test execution.  The documentation that follows explains how to address this so that a screenshot of the app's current state is generated and attached to the Allure Report each time an `it` test completes its run.  It also allows to obtain a source snapshot of the XML representative of the current Roku app's state whenever an `it` test run fails.
 
