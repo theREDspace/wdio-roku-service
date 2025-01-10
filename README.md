@@ -247,3 +247,104 @@ await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST'
 * There will be a PR submitted soon that allows for this service to be installed during the `npm init wdio@latest` questionnaire.
 * Currently evaluating Socket communication with the Roku such that more features can be tooled, such as a means to wake a sleeping Roku.
 * Network proxy feature(s) that allow for keying off of network activity.
+
+## Leveraging the Allure Reporting with attached Screenshots and XML files
+
+Out of the box, Allure Reporting does not have a configuration in place to generate screenshots of the app or a copy of the XML code representative of the current state of the Roku app at any point of the test execution.  The documentation that follows explains how to address this so that a screenshot of the app's current state is generated and attached to the Allure Report each time an `it` test completes its run.  It also allows to obtain a source snapshot of the XML representative of the current Roku app's state whenever an `it` test run fails.
+
+For the full documentation on Allure Reporter, please visit @wdio/allure-reporter docs https://webdriver.io/docs/allure-reporter/
+
+### Utils.js dependency
+Add the following code to a file called `Utils.js`.  This file may live in your `/helpers` folder or similar.
+```js
+/**
+ * Returns a string representation of the 'now' timestamp in milliseconds for the epoch.
+ */
+export const getEpochTimestamp = async () => {
+    return Date.now().toString()
+}
+
+/**
+ * Returns a string representation of the 'now' timestamp following the pattern: {YYYY}-{MM}-{DD}_{hour in 24H}-{Minute}-{Second}-{Milliseconds}
+ */
+export const getLongFormatTimestamp = async () => {
+    const now = new Date(Date.now())
+    const result = `${now.getFullYear()}-${now.getMonth() + 1}-${now.getDate()}_${now.getHours()}-${now.getMinutes()}-${now.getSeconds()}-${now.getMilliseconds()}`
+    return result
+}
+
+/**
+ * An object containing the string representations of possible file extensions used for reporting purposes.
+ */
+export const FILE_EXTENSIONS = {
+    JPG: '.jpg',
+    XML: '.xml'
+}
+
+/**
+ * An object containing the string representations of possible MIME types used for reporting purposes.
+ */
+export const FILE_MIME_TYPES = {
+    JPG: 'image/jpeg',
+    XML: 'application/xml'
+}
+
+/**
+ * A function to generate a filename with a possible prefix, a timestamp and one of the possible extensions provided.
+ * @param {string} fileExtension Use one of the values from the FILE_EXTENSIONS object defined previously.
+ * @param {string} [fileNamePrefix] A prefix to be appended at the beginning of the filename if provided.  Defaults to an empty string.
+ */
+export const getFileNameWithTimestamp = async (fileExtension, fileNamePrefix = '') => {
+    return (fileNamePrefix !== '')
+        ? `${fileNamePrefix}_${await getLongFormatTimestamp()}${fileExtension}`
+        : `${await getLongFormatTimestamp()}${fileExtension}`
+}
+
+```
+
+### wdio.conf.js code
+Add the following import statements on the `wdio.conf.js` file:
+```js
+import { readFile, rm } from 'node:fs/promises'
+import { addAttachment } from '@wdio/allure-reporter'
+import { FILE_EXTENSIONS, FILE_MIME_TYPES, getFileNameWithTimestamp } from './<Utils.js file path>/Utils.js'  // Replace <Utils.js file path> with actual relative path to file Utils.js
+
+```
+
+Define the following `afterTest` hook on the `wdio.conf.js` file.  If you already have working code in this hook, append the below provided code to it.
+```js
+afterTest: async function (test, context, result) {
+        // Screenshot saving and attaching logic regardless of test outcome.
+        const fileName = await getFileNameWithTimestamp(FILE_EXTENSIONS.JPG)
+        try {
+            const tempScreenshotPath = `./allure-results/${fileName}`
+            await browser.saveScreenshot(tempScreenshotPath)
+            const screenShotData = await readFile(tempScreenshotPath)
+            addAttachment(`${fileName}`, screenShotData, FILE_MIME_TYPES.JPG)
+            await rm(tempScreenshotPath).catch((rmError) => {
+                console.error(`Failed to remove file: ${tempScreenshotPath}`, rmError)
+            })
+        } catch (error) {
+            console.error('Error handling screenshot or attachment: ', error)
+        }
+
+        // XML attaching logic on test failure.
+        if (result.passed === false) {
+            const fileName = await getFileNameWithTimestamp(FILE_EXTENSIONS.XML, 'AppStateAfterTestFail')
+            const rawSourceString = String(await browser.getPageSource())
+            const extractedXMLSubstring = '<?xml version="1.0" encoding="UTF-8" ?>\n'.concat(rawSourceString.substring(rawSourceString.search('<app-ui xmlns="">'), rawSourceString.search('</app-ui>')).concat('</app-ui>')).replace('<app-ui xmlns="">', '<app-ui>')
+            try {
+                addAttachment(`${fileName}`, extractedXMLSubstring, FILE_MIME_TYPES.XML)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+    },
+```
+
+### Expected behaviour
+With this code in place in the project's config, the expectation is that each time an `it` test is run, regardless of the test's outcome, a screenshot will be taken at the end of the run and attached to its relevant section in the Allure report.  In the specific instance of the test failing, a source snapshot of the app's state in XML format will also be attached to the test's section in the Allure report.
+
+### Notes
+* Out of the box Allure reports support screenshots in `.png` format.  Method overrides in this service support the image in `.jpg` format instead.
+* XML attachments may be browsed in the Allure report itself or opened in a separate tab in a browser.
