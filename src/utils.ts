@@ -49,8 +49,8 @@ export const log: Logger = {
  * @returns Whether the app is now ready
  */
 export const waitForAppReady = async (retries: number): Promise<boolean> => {
+  let counter: number = 0;
   while (true) {
-    let counter: number = 0;
     const response = await ECP(endpoints.appUI, 'GET');
     const ui = await response.text();
     // It's theoretically possible that the user has something that looks like a failed status in their successful scene somewhere, so substring just in case
