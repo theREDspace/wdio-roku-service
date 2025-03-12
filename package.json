@@ -1,71 +1,77 @@
 {
-    "name": "wdio-roku-service",
-    "version": "1.1.5",
-    "description": "WebdriverIO service to facilitate Roku testing",
-    "author": "REDspace",
-    "homepage": "https://github.com/theREDspace/wdio-roku-service",
-    "license": "MIT",
-    "type": "module",
-    "module": "dist/index.js",
-    "types": "dist/index.d.ts",
-    "scripts": {
-        "build": "rm -rf dist/ && tsc --removeComments && tsc --declaration --emitDeclarationOnly",
-        "release": "release-it"
+  "name": "wdio-roku-service",
+  "version": "1.1.5",
+  "description": "WebdriverIO service to facilitate Roku testing",
+  "author": "REDspace",
+  "homepage": "https://github.com/theREDspace/wdio-roku-service",
+  "license": "MIT",
+  "type": "module",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rm -rf dist/ && tsc --removeComments && tsc --declaration --emitDeclarationOnly",
+    "release": "release-it"
+  },
+  "keywords": [
+    "webdriverio",
+    "wdio",
+    "wdio-service",
+    "roku"
+  ],
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
-    "keywords": [
-        "webdriverio",
-        "wdio",
-        "wdio-service",
-        "roku"
-    ],
-    "exports": {
-        ".": {
-            "import": "./dist/index.js",
-            "types": "./dist/index.d.ts"
-        },
-        "./controller": {
-            "import": "./dist/controller.js",
-            "types": "./dist/controller.d.ts"
-        },
-        "./info": {
-            "import": "./dist/info.js",
-            "types": "./dist/info.d.ts"
-        },
-        "./channel": {
-            "import": "./dist/channel.js",
-            "types": "./dist/channel.d.ts"
-        },
-        "./ecp": {
-            "import": "./dist/ecp.js",
-            "types": "./dist/ecp.d.ts"
-        },
-        "./install": {
-            "import": "./dist/install.js",
-            "types": "./dist/install.d.ts"
-        }
+    "./controller": {
+      "import": "./dist/controller.js",
+      "types": "./dist/controller.d.ts"
     },
-    "dependencies": {
-        "@wdio/utils": "^9.1.0",
-        "debug": "^4.3.7",
-        "expect": "^29.7.0",
-        "expect-webdriverio": "^5.0.2",
-        "tmp": "^0.2.3",
-        "webdriverio": "^9.0.9"
+    "./info": {
+      "import": "./dist/info.js",
+      "types": "./dist/info.d.ts"
     },
-    "devDependencies": {
-        "@eslint/js": "^9.12.0",
-        "@types/debug": "^4.1.12",
-        "@types/eslint__js": "^8.42.3",
-        "@types/tmp": "^0.2.6",
-        "eslint": "^9.12.0",
-        "husky": "^9.1.6",
-        "lint-staged": "^15.2.10",
-        "prettier": "^3.3.3",
-        "release-it": "^17.10.0",
-        "typescript": "^5.6.2",
-        "typescript-eslint": "^8.8.1"
+    "./channel": {
+      "import": "./dist/channel.js",
+      "types": "./dist/channel.d.ts"
     },
-    "files": [
-        "dist/*"
-    ]
+    "./ecp": {
+      "import": "./dist/ecp.js",
+      "types": "./dist/ecp.d.ts"
+    },
+    "./install": {
+      "import": "./dist/install.js",
+      "types": "./dist/install.d.ts"
+    }
+  },
+  "dependencies": {
+    "@wdio/utils": "^9.1.0",
+    "debug": "^4.3.7",
+    "expect": "^29.7.0",
+    "expect-webdriverio": "^5.0.2",
+    "tmp": "^0.2.3",
+    "webdriverio": "^9.0.9"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.12.0",
+    "@types/debug": "^4.1.12",
+    "@types/eslint__js": "^8.42.3",
+    "@types/tmp": "^0.2.6",
+    "eslint": "^9.12.0",
+    "husky": "^9.1.6",
+    "lint-staged": "^15.2.10",
+    "prettier": "^3.3.3",
+    "release-it": "^17.10.0",
+    "typescript": "^5.6.2",
+    "typescript-eslint": "^8.8.1"
+  },
+  "release-it": {
+    "npm": {
+      "release": true,
+      "publishPath": "./dist"
+    }
+  },
+  "files": [
+    "dist/*"
+  ]
 }
