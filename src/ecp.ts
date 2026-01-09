@@ -17,7 +17,7 @@ export const endpoints = {
   keydown: 'keydown/%s',
   keypress: 'keypress/%s',
   keyup: 'keyup/%s',
-  launch: 'launch/%s?contentId=%s&mediaType=%s',
+  launch: 'launch/%s',
   load: 'plugin_install',
   performance: 'query/chanperf',
   player: 'query/media-player',

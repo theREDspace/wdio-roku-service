@@ -216,12 +216,22 @@ await browser.openRokuXML();
 ```
 
 ### Deeplinking
-`wdio-roku-service/channel` provides channel-related functionality. `inputChannel` allows you to send arbitrary information to your app.
+`wdio-roku-service/channel` provides channel-related functionality for deeplinking. Use `deeplink` to launch an app with deeplink parameters, or `inputDeeplink` to send deeplink parameters to an already-running app.
 ```js
-import { exitChannel, launchChannel, MediaType } from 'wdio-roku-service/channel';
+import { exitChannel, deeplink, inputDeeplink, MediaType } from 'wdio-roku-service/channel';
+
+// Launch app with deeplink
 await exitChannel();
-await launchChannel(process.env.ROKU_CHANNEL_ID, myContent, MediaType.MOVIE, {myExtraParameter:true});
-await expect(MyContent.header).toBeDisplayed();
+await deeplink(process.env.ROKU_CHANNEL_ID, '1234567', MediaType.MOVIE);
+
+// Send deeplink to already-running app
+await inputDeeplink(anotherContent, MediaType.EPISODE);
+```
+
+`inputChannel` allows you to send arbitrary custom parameters to your already-running app.
+```js
+import { inputChannel } from 'wdio-roku-service/channel';
+await inputChannel({customEvent: 'refresh', userId: '12345'});
 ```
 
 ### Other Functions

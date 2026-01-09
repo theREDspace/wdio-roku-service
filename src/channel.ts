@@ -1,5 +1,5 @@
 import { ECP, endpoints } from './ecp.js';
-import { formatString } from './utils.js';
+import { formatString, waitForAppReady, sleep } from './utils.js';
 
 export enum MediaType {
   SERIES = 'series',
@@ -23,29 +23,68 @@ export const getChannelState = (channelId: string) => {
 };
 
 /**
- * Launches a Roku channel by its ID. Can be used with optional deeplink parameters.
+ * Launches a Roku channel by its ID.
  *
- * @param channelId - The channel ID of the Roku app you want to install.
- * @param contentId - Optional. The content ID of the content within the app you want to deeplink to.
- * @param mediaType - Optional. The media type of the content you're deeplinking to.
- * @param queryParams - Optional. Additional arguments to send to the app.
- * @returns The response from the ECP
+ * @param channelId - The channel ID of the Roku app you want to launch.
+ * @returns Promise that resolves to true if the app successfully launches
+ * @throws Error if the app fails to launch after retries
  */
-export const launchChannel = (
-  channelId: string,
-  contentId: string = '',
-  mediaType: string = '',
-  queryParams?: { [key: string]: string | number | boolean },
-) => {
-  let uri = formatString(endpoints.launch, channelId, contentId, mediaType);
+export const launchChannel = async (channelId: string): Promise<boolean> => {
+  await sleep(500); // Allow any in-progress Roku state transitions to complete, such as calling this function immediately after pressing the Home button.
 
-  if (queryParams) {
-    Object.entries(queryParams).forEach((param) => {
-      uri = `${uri}&${encodeURIComponent(param[0])}=${encodeURIComponent(param[1])}`;
-    });
+  const uri = formatString(endpoints.launch, channelId);
+  await ECP(uri, 'POST');
+  await sleep(1000);
+
+  const ready = await waitForAppReady(3);
+  if (!ready) {
+    throw new Error(`Failed to launch channel '${channelId}': app did not reach ready state`);
   }
 
-  return ECP(uri, 'POST');
+  return true;
+};
+
+/**
+ * Deeplinks into a Roku channel with specific content.
+ *
+ * @param channelId - The channel ID of the Roku app.
+ * @param contentId - The content ID of the content within the app you want to deeplink to.
+ * @param mediaType - The media type of the content you're deeplinking to.
+ * @returns Promise that resolves to true if the deeplink successfully launches
+ * @throws Error if the deeplink fails after retries
+ */
+export const deeplink = async (
+  channelId: string,
+  contentId: string,
+  mediaType: string,
+): Promise<boolean> => {
+  await sleep(500); // Allow any in-progress Roku state transitions to complete, such as calling this function immediately after pressing the Home button.
+
+  const uri = `${formatString(endpoints.launch, channelId)}?contentId=${encodeURIComponent(contentId)}&mediaType=${encodeURIComponent(mediaType)}`;
+
+  await ECP(uri, 'POST');
+  await sleep(1000);
+
+  const ready = await waitForAppReady(3);
+  if (!ready) {
+    throw new Error(`Failed to deeplink to channel '${channelId}' with contentId '${contentId}': app did not reach ready state`);
+  }
+
+  return true;
+};
+
+/**
+ * Sends deeplink parameters to an already-running application.
+ *
+ * @param contentId - The content ID of the content within the app you want to deeplink to.
+ * @param mediaType - The media type of the content you're deeplinking to.
+ * @returns The response from the ECP
+ */
+export const inputDeeplink = (
+  contentId: string,
+  mediaType: string,
+) => {
+  return inputChannel({ contentId, mediaType });
 };
 
 /**

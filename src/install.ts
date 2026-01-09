@@ -7,30 +7,35 @@ import * as fs from 'fs';
  * Installs a Roku channel by its ID. Can be used to install without a zip.
  *
  * @param channelId - The channel ID of the Roku app you want to install.
- * @returns Whether the app is now ready for use
+ * @returns Promise that resolves to true if the app successfully installs and launches
+ * @throws Error if the installation or launch fails
  */
 export const installByID = async (channelId: string): Promise<boolean> => {
-  try {
-    const uri = formatString(endpoints.install, channelId);
-    await ECP(uri, 'POST');
-    await sleep(1000);
-    await launchChannel(channelId);
-    return waitForAppReady(5);
-  } catch (error) {
-    console.error('Error fetching from Roku:', error);
-    return false;
+  const uri = formatString(endpoints.install, channelId);
+  await ECP(uri, 'POST');
+  await sleep(1000);
+  await launchChannel(channelId); // Throws on failure
+
+  const ready = await waitForAppReady(5);
+  if (!ready) {
+    throw new Error(`Failed to install channel '${channelId}': app did not reach ready state after installation`);
   }
+
+  return true;
 };
 
 /**
  * Sideload a Roku app to a device. This can be later accessed through the channel ID 'dev'
  *
  * @param pathToArchive - The path to the archive containing the Roku app to sideload
- * @returns Whether the app is now ready to use.
+ * @returns Promise that resolves to true if the app successfully installs
+ * @throws Error if the installation fails
  */
 export const installFromZip = async (pathToArchive: string): Promise<boolean> => {
   const headers = await getAuthHeaders(endpoints.load, 'POST');
-  if (headers === undefined) return false;
+  if (headers === undefined) {
+    throw new Error('Failed to get authentication headers for archive installation');
+  }
 
   const form = new FormData();
 
@@ -42,14 +47,20 @@ export const installFromZip = async (pathToArchive: string): Promise<boolean> =>
     form.append('archive', blob, 'name');
     form.append('mysubmit', 'Install');
   } catch (e: unknown) {
-    console.error(e);
-    return false;
+    throw new Error(`Failed to read archive file '${pathToArchive}': ${e}`);
   }
 
   const response: Response = (await ECP(endpoints.load, 'POST', false, form, headers)) as Response;
-  if (response.status !== 200) return false;
-  // If the app hasn't loaded after 20 seconds, it probably isn't going to.
-  return await waitForAppReady(5);
+  if (response.status !== 200) {
+    throw new Error(`Failed to install archive: Roku returned status ${response.status}`);
+  }
+
+  const ready = await waitForAppReady(5);
+  if (!ready) {
+    throw new Error('Failed to install archive: app did not reach ready state after installation');
+  }
+
+  return true;
 };
 
 /**
