@@ -80,10 +80,7 @@ export const deeplink = async (
  * @param mediaType - The media type of the content you're deeplinking to.
  * @returns The response from the ECP
  */
-export const inputDeeplink = (
-  contentId: string,
-  mediaType: string,
-) => {
+export const inputDeeplink = (contentId: string, mediaType: string) => {
   return inputChannel({ contentId, mediaType });
 };
 
