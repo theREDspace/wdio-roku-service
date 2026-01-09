@@ -8,6 +8,7 @@ export enum MediaType {
   MOVIE = 'movie',
   SHORT = 'shortFormVideo',
   SPECIAL = 'tvSpecial',
+  LIVE = 'live',
 }
 
 /**
