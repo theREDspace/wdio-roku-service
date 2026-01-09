@@ -44,50 +44,27 @@ export const log: Logger = {
 };
 
 /**
- * Retry an operation until it returns true or max retries is reached.
- *
- * @param operation - Async function to execute that returns a boolean
- * @param retries - Maximum number of retries
- * @param delayMs - Delay in milliseconds between retries
- * @returns Whether the operation succeeded
- */
-export const pollUntilSuccess = async (
-  operation: () => Promise<boolean>,
-  retries: number,
-  delayMs: number,
-): Promise<boolean> => {
-  let counter = 0;
-
-  while (true) {
-    const success = await operation();
-
-    if (success) return true;
-
-    counter++;
-    if (counter < retries) {
-      await sleep(delayMs);
-    } else {
-      break;
-    }
-  }
-
-  return false;
-};
-
-/**
  * Wait for the app to be ready. Indicated by status "OK", otherwise will be "FAILED".
  *
  * @returns Whether the app is now ready
  */
 export const waitForAppReady = async (retries: number): Promise<boolean> => {
-  return pollUntilSuccess(async () => {
+  let counter: number = 0;
+  while (true) {
     const response = await ECP(endpoints.appUI, 'GET');
     const ui = await response.text();
     // It's theoretically possible that the user has something that looks like a failed status in their successful scene somewhere, so substring just in case
     const statusLocation = ui.indexOf('status');
     const statusText = ui.substring(statusLocation + 6, statusLocation + 15);
-    return statusText.indexOf('FAILED') < 0;
-  }, retries, 5000);
+    if (statusText.indexOf('FAILED') < 0) return true;
+    counter++;
+    if (counter < retries) {
+      await sleep(5000);
+    } else {
+      break;
+    }
+  }
+  return false;
 };
 
 /**
