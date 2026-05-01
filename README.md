@@ -247,11 +247,305 @@ import { ECP } from 'wdio-roku-service/ecp';
 await ECP('search/browse?keyword=voyage&type=movie&tmsid=MV000058030000', 'POST');
 ```
 
+### Telnet Log Capture
+`wdio-roku-service/telnet` provides the ability to capture debug logs from your Roku device via telnet (port 8085). This is useful for capturing BrightScript print statements and debug output during test execution.
+
+Use `connectTelnet` for quick setup. Use `new RokuTelnetLogger()` + `connect()` when you need explicit lifecycle control.
+
+Quick test setup (convenience method):
+```js
+import { connectTelnet } from 'wdio-roku-service/telnet';
+import { launchChannel } from 'wdio-roku-service/channel';
+
+describe('App Logging (quick setup)', () => {
+    let logger;
+
+    before(async () => {
+        logger = await connectTelnet({ host: process.env.ROKU_IP });
+    });
+
+    after(async () => {
+        await logger.disconnect();
+    });
+
+    it('waits for startup log', async () => {
+        // Start waiting before the action that emits the log.
+        const waitForInit = logger.waitForLog(/\[INFO\] App initialized/, 10000);
+        await launchChannel('dev');
+        const line = await waitForInit;
+
+        expect(line).toContain('App initialized');
+    });
+});
+```
+
+Larger suite setup (manual lifecycle control):
+```js
+import { RokuTelnetLogger } from 'wdio-roku-service/telnet';
+import { launchChannel } from 'wdio-roku-service/channel';
+
+describe('App Logging', () => {
+    let logger;
+
+    before(async () => {
+        logger = new RokuTelnetLogger({ host: process.env.ROKU_IP });
+        await logger.connect();
+    });
+
+    beforeEach(() => {
+        // Isolate captured logs per test while reusing one connection.
+        logger.startCapture();
+    });
+
+    after(async () => {
+        await logger.disconnect();
+    });
+
+    afterEach(async function () {
+        const captured = await logger.stopCapture();
+        if (this.currentTest?.state === 'failed') {
+            console.log(captured);
+        }
+    });
+
+    it('should log startup message', async () => {
+        const waitForInit = logger.waitForLog(/\[INFO\] App initialized/, 10000);
+        await launchChannel('dev');
+        const startupLog = await waitForInit;
+        expect(startupLog).toContain('App initialized');
+    });
+
+    it('can stream and filter live logs', async () => {
+        const stream = logger.createLogStream();
+        stream.on('data', (line) => {
+            if (line.includes('AppMeasurement')) {
+                console.log('Beacon:', line.trim());
+            }
+        });
+
+        // ... actions that produce logs ...
+
+        stream.destroy();
+    });
+});
+```
+
+Lifecycle guidance:
+* In most suites, connect once in `before` and disconnect once in `after`.
+* Use `startCapture`/`stopCapture` or a per-test stream to keep logs isolated without reconnecting every test.
+* Reconnect per test only if you explicitly need test-level connection isolation.
+
+### Stream-Per-Test Pattern (Recommended)
+This pattern keeps one logger connected across all tests, creates a fresh stream for each test, and writes logs to an artifact file only on failure.
+
+> **Important:** `onPrepare` runs in the WDIO **launcher process**, which is a separate Node.js process from the workers where your tests execute. Module-level state (like a telnet logger instance) created in `onPrepare` is **not shared** with workers. Always initialize telnet in `before` (which runs in the worker).
+
+Helper module (`helpers/telnet-manager.ts`):
+```ts
+import { RokuTelnetLogger } from 'wdio-roku-service/telnet';
+import { PassThrough } from 'stream';
+
+let logger: RokuTelnetLogger | null = null;
+let currentStream: PassThrough | null = null;
+let streamData: string[] = [];
+
+export async function initTelnetLogger() {
+  if (!logger) {
+    logger = new RokuTelnetLogger({ host: process.env.ROKU_IP });
+    await logger.connect();
+  }
+}
+
+export async function teardownTelnetLogger() {
+  if (logger) {
+    await logger.disconnect();
+    logger = null;
+  }
+}
+
+export function startTestStream() {
+  if (!logger) throw new Error('Logger not initialized');
+
+  streamData = [];
+  currentStream = logger.createLogStream();
+
+  currentStream.on('data', (chunk: Buffer | string) => {
+    const line = chunk.toString();
+    streamData.push(line);
+  });
+}
+
+export async function stopTestStream(filePath?: string): Promise<string[]> {
+  if (currentStream) {
+    currentStream.destroy();
+    currentStream = null;
+  }
+
+  const data = streamData;
+  streamData = [];
+
+  if (filePath && data.length > 0) {
+    const fs = await import('fs/promises');
+    const path = await import('path');
+    const content = data.join('\n');
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, content, 'utf-8');
+  }
+
+  return data;
+}
+
+export function getLogger() {
+  if (!logger) throw new Error('Logger not initialized');
+  return logger;
+}
+
+export function getCurrentStreamData(): string[] {
+  return [...streamData];
+}
+```
+
+Config integration (`wdio.conf.ts`):
+```ts
+import { initTelnetLogger, teardownTelnetLogger, startTestStream, stopTestStream } from './helpers/telnet-manager.js';
+
+export const config: WebdriverIO.Config = {
+  // ... other config ...
+
+  // onPrepare runs in the launcher process — use it for sideloading/installation only.
+  // Do NOT initialize telnet here; the worker cannot access launcher-process state.
+  onPrepare: async () => {
+    await installFromZip(process.env.ROKU_APP_PATH);
+  },
+
+  // before runs in the worker process — initialize telnet here.
+  before: [
+    async () => {
+      await initTelnetLogger();
+      startTestStream();
+    }
+  ],
+
+  afterTest: [
+    async (test, context, result) => {
+      const filePath = !result.passed ? `./test-artifacts/${test.title}-telnet.log` : undefined;
+      const logs = await stopTestStream(filePath);
+
+      // Write artifact only on failure
+      if (!result.passed && logs.length > 0 && filePath) {
+        console.log(`Telnet logs written to: ${filePath}`);
+      }
+    }
+  ],
+
+  after: [
+    async () => {
+      await teardownTelnetLogger();
+    }
+  ],
+
+  // ... rest of config ...
+};
+```
+
+With this setup, **every test automatically gets telnet log capture and failure artifacts** — no test-file code needed. Tests that need to make assertions on log content can import `getCurrentStreamData` or `createLogAnalyzer` explicitly.
+
+In your test file:
+```ts
+import { getLogger } from '../helpers/telnet-manager.js';
+import { launchChannel } from 'wdio-roku-service/channel';
+
+describe('App with log assertions', () => {
+  it('waits for and extracts startup logs', async () => {
+    const logger = getLogger();
+
+    // Start waiting before triggering the action
+    const waitForInit = logger.waitForLog(/\[INFO\] App initialized/, 10000);
+    await launchChannel('dev');
+    const line = await waitForInit;
+
+    expect(line).toContain('App initialized');
+  });
+});
+```
+
+### Structured Parsing
+Built-in parsing in this package is focused on Roku OS signal beacons (for example `[beacon.signal] |AppLaunchComplete ...`).
+
+For app-specific logs (analytics, SDK output, custom business events), define custom parsers in your WDIO project and register them with the analyzer.
+
+Structured parsing with built-in Roku beacon parser plus a custom app parser:
+```ts
+import { createLogAnalyzer, type LogParser } from 'wdio-roku-service/logs';
+import { getCurrentStreamData } from '../helpers/telnet-manager.js';
+
+// Example custom parser defined in your WDIO project (not built into this package).
+const mparticleLikeParser: LogParser<{ eventName: string }> = {
+  id: 'custom-analytics',
+  domain: 'analytics',
+  matches: (line) => line.includes('mParticle SDK') || line.includes('Logging message:'),
+  parse: (line) => {
+    const match = line.match(/"n":"([^"]+)"/);
+    if (!match) return null;
+    return {
+      parserId: 'custom-analytics',
+      domain: 'analytics',
+      type: 'analytics-event',
+      raw: line,
+      data: { eventName: match[1] },
+    };
+  },
+};
+
+describe('Launch telemetry', () => {
+  it('captures beacon signals and validates a custom analytics event', async () => {
+    const analyzer = createLogAnalyzer();
+    analyzer.registerParser(mparticleLikeParser);
+
+    // Perform actions that produce telnet output (navigation, deeplinks, etc.)
+    // Beacon signals and app logs are captured by the per-test stream automatically.
+    await Homepage.navigateTo();
+    await Homepage.isLoaded();
+
+    // Parse all lines collected so far for this test.
+    analyzer.ingestLines(getCurrentStreamData());
+
+    // Get all Roku beacons parsed from currentStream.
+    const allBeacons = analyzer.getEvents({ domain: 'performance' });
+    expect(allBeacons.length).toBeGreaterThan(0);
+
+    // Filter beacons by name.
+    const launchBeacons = allBeacons.filter((event) => event.type === 'AppLaunchComplete');
+    expect(launchBeacons.length).toBeGreaterThan(0);
+
+    const launchEvent = launchBeacons[0];
+    expect(launchEvent.data).toMatchObject({ eventName: 'AppLaunchComplete' });
+
+    const analyticsEvent = analyzer.findFirst({
+      domain: 'analytics',
+      predicate: (event) => {
+        const data = event.data as { eventName?: string };
+        return data.eventName === 'screen_viewed';
+      },
+    });
+    expect(analyticsEvent).toBeDefined();
+  });
+});
+```
+
+> **Note:** Beacon signals like `AppLaunchComplete` fire when the app launches. If your app is sideloaded in `onPrepare`, those beacons fire before the worker's telnet stream is active. To capture launch beacons, either trigger a re-launch from the worker (e.g., `await ECP('launch/dev', 'POST')`) after `startTestStream`, or start telnet in `onPrepare` before `installFromZip` and accept that only the `[TELNET RAW]` event listener (not per-test streams) will see them.
+
+With this approach:
+* One connection per worker/spec file (efficient, minimal flakiness).
+* One stream per test (isolated log capture).
+* Logs written to artifacts only on failure (minimal disk footprint).
+* Built-in structured parsing for Roku signal beacons.
+* Custom parser hooks for team-specific logs.
+
 ## Common Gotchas
 * Roku elements have their text in a 'text' attribute, not between their tags. When doing selectors, doing `$('element=Text')` won't work for almost every element. Instead, you'll have to do `$('element[text=Text]')`.
 
 ## Feature Roadmap
-* There will be a PR submitted soon that allows for this service to be installed during the `npm init wdio@latest` questionnaire.
 * Currently evaluating Socket communication with the Roku such that more features can be tooled, such as a means to wake a sleeping Roku.
 * Network proxy feature(s) that allow for keying off of network activity.
 

@@ -2,6 +2,21 @@
 import RokuWorkerService from './service.js';
 
 export default RokuWorkerService;
+export { RokuTelnetLogger, connectTelnet } from './telnet.js';
+export type { TelnetLoggerOptions, TelnetLoggerEvents } from './telnet.js';
+export {
+  LogAnalyzer,
+  createLogAnalyzer,
+  builtInLogParsers,
+  rokuPerformanceParser,
+} from './logs/index.js';
+export type {
+  WaitForEventOptions,
+  ParsedLogEvent,
+  LogParser,
+  EventFilter,
+  RokuPerformanceEventData,
+} from './logs/index.js';
 
 declare global {
   namespace WebdriverIO {
