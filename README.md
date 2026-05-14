@@ -366,6 +366,11 @@ export async function teardownTelnetLogger() {
 export function startTestStream() {
   if (!logger) throw new Error('Logger not initialized');
 
+  if (currentStream) {
+    currentStream.destroy();
+    currentStream = null;
+  }
+
   streamData = [];
   currentStream = logger.createLogStream();
 
