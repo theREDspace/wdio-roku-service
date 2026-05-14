@@ -193,6 +193,14 @@ export class RokuTelnetLogger extends EventEmitter {
   }
 
   /**
+   * Check if a per-test capture is currently active (started via `startCapture()`).
+   * Useful as a guard in `beforeTest` hooks to avoid restarting an already-active capture.
+   */
+  get capturing(): boolean {
+    return this.captureLines !== null;
+  }
+
+  /**
    * Returns an independent Readable stream of log lines (utf-8, one line per chunk).
    * Each call creates a new stream so multiple consumers can filter independently
    * without interfering with each other's backpressure.

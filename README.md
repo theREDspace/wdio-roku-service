@@ -407,7 +407,7 @@ export function getCurrentStreamData(): string[] {
 
 Config integration (`wdio.conf.ts`):
 ```ts
-import { initTelnetLogger, teardownTelnetLogger, startTestStream, stopTestStream } from './helpers/telnet-manager.js';
+import { initTelnetLogger, teardownTelnetLogger, startTestStream, stopTestStream, getLogger } from './helpers/telnet-manager.js';
 
 export const config: WebdriverIO.Config = {
   // ... other config ...
@@ -423,12 +423,23 @@ export const config: WebdriverIO.Config = {
     async () => {
       await initTelnetLogger();
       startTestStream();
+      // Re-launch channel after stream starts to capture startup logs
+      await ECP('launch/dev', 'POST');
+    }
+  ],
+
+  // Ensure capture is active before each test (restart if previous afterTest stopped it)
+  beforeTest: [
+    (test) => {
+      if (!getLogger().capturing) {
+        startTestStream();
+      }
     }
   ],
 
   afterTest: [
     async (test, context, result) => {
-      const filePath = !result.passed ? `./test-artifacts/${test.title}-telnet.log` : undefined;
+      const filePath = !result.passed ? `./telnet-logs/${test.title}-telnet.log` : undefined;
       const logs = await stopTestStream(filePath);
 
       // Write artifact only on failure
@@ -449,6 +460,26 @@ export const config: WebdriverIO.Config = {
 ```
 
 With this setup, **every test automatically gets telnet log capture and failure artifacts** — no test-file code needed. Tests that need to make assertions on log content can import `getCurrentStreamData` or `createLogAnalyzer` explicitly.
+
+#### Attaching Telnet Logs to Reports
+
+If you use a reporter like [Allure](https://webdriver.io/docs/allure-reporter/), you can attach telnet logs (and other artifacts) to the test report on failure:
+```ts
+import { addAttachment } from '@wdio/allure-reporter';
+
+// In afterTest:
+afterTest: [
+  async (test, context, result) => {
+    const filePath = !result.passed ? `./telnet-logs/${test.title}-telnet.log` : undefined;
+    const logs = await stopTestStream(filePath);
+
+    if (!result.passed && logs.length > 0) {
+      // Attach telnet logs to the Allure report
+      addAttachment(`${test.title}-telnet.log`, logs.join('\n'), 'text/plain');
+    }
+  }
+],
+```
 
 In your test file:
 ```ts
