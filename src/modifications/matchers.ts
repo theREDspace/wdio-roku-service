@@ -1,7 +1,15 @@
 import { expect, MatcherContext } from 'expect';
 import { getConfig } from 'expect-webdriverio';
-import type { AssertionHookParams, PartialMatcher } from 'expect-webdriverio';
+import type { AssertionHookParams } from 'expect-webdriverio';
+
 type WdioElementMaybePromise = Promise<WebdriverIO.Element> | WebdriverIO.Element;
+type MatcherPartial<T> = ExpectWebdriverIO.PartialMatcher<T> & {
+  sample?: T;
+  asymmetricMatch(actual: T): boolean;
+  toString(): string;
+  $$typeof?: symbol | number;
+};
+type MatcherTextValue = string | RegExp | MatcherPartial<string>;
 
 export function applyMatcherModifications() {
   //@ts-expect-error Listed as necessary in wdio docs
@@ -212,7 +220,7 @@ export function applyMatcherModifications() {
     async toHaveAttribute(
       actual: WdioElementMaybePromise,
       attribute: string,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -224,14 +232,14 @@ export function applyMatcherModifications() {
         attributeExpectation(`attribute ${attribute}`, value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute(attribute)).toString();
+          return (await element.getAttribute(attribute))?.toString() ?? '';
         }
       );
     },
     async toHaveAttr(
       actual: WdioElementMaybePromise,
       attribute: string,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -243,14 +251,14 @@ export function applyMatcherModifications() {
         attributeExpectation(`attr ${attribute}`, value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute(attribute)).toString();
+          return (await element.getAttribute(attribute))?.toString() ?? '';
         }
       );
     },
     async toHaveElementProperty(
       actual: WdioElementMaybePromise,
       attribute: string,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -262,13 +270,13 @@ export function applyMatcherModifications() {
         attributeExpectation(`element property ${attribute}`, value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute(attribute)).toString();
+          return (await element.getAttribute(attribute))?.toString() ?? '';
         }
       );
     },
     async toHaveElementClass(
       actual: WdioElementMaybePromise,
-      value: string | RegExp | PartialMatcher,
+      value: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -280,13 +288,13 @@ export function applyMatcherModifications() {
         attributeExpectation('element class', value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute('name')).toString();
+          return (await element.getAttribute('name'))?.toString() ?? '';
         }
       );
     },
     async toHaveClass(
       actual: WdioElementMaybePromise,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -298,13 +306,13 @@ export function applyMatcherModifications() {
         attributeExpectation('class', value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute('name')).toString();
+          return (await element.getAttribute('name'))?.toString() ?? '';
         }
       );
     },
     async toHaveId(
       actual: WdioElementMaybePromise,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -316,13 +324,13 @@ export function applyMatcherModifications() {
         attributeExpectation('id', value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute('name')).toString();
+          return (await element.getAttribute('name'))?.toString() ?? '';
         }
       );
     },
     async toHaveText(
       actual: WdioElementMaybePromise,
-      value?: string | RegExp | PartialMatcher,
+      value?: MatcherTextValue,
       options: ExpectWebdriverIO.StringOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -334,13 +342,13 @@ export function applyMatcherModifications() {
         attributeExpectation('text', value),
         options,
         async (element:WebdriverIO.Element) => {
-          return (await element.getAttribute('text')).toString();
+          return (await element.getAttribute('text'))?.toString() ?? '';
         }
       );
     },
     async toHaveHTML(
       actual: WdioElementMaybePromise,
-      value: string | RegExp | PartialMatcher,
+      value: MatcherTextValue,
       options: ExpectWebdriverIO.HTMLOptions = getConfig() as ExpectWebdriverIO.DefaultOptions,
     ) {
       return genericMatcher(
@@ -371,7 +379,7 @@ async function expectToExist(element: WebdriverIO.Element) {
 /** Reusable function for attribute-related matchers */
 async function expectToHaveAttr(
   attribute: string,
-  value: string | RegExp | PartialMatcher | undefined,
+  value: MatcherTextValue | undefined,
   options: ExpectWebdriverIO.StringOptions,
   element: WebdriverIO.Element,
 ) {
@@ -383,11 +391,11 @@ async function expectToHaveAttr(
   return compareText(attr, value, options).result;
 }
 
-function attributeExpectation(expectation:string, value?:string | RegExp | PartialMatcher) {
+function attributeExpectation(expectation:string, value?: MatcherTextValue) {
   if (value === undefined) return expectation;
   let valueString = value.toString();
   if (isStringContainingMatcher(value)) {
-    valueString = value.sample;
+    valueString = value.sample ?? value.toString();
   }
   return `${expectation} as ${valueString}`;
 }
@@ -501,7 +509,7 @@ const compareNumbers = (actual: number, options: ExpectWebdriverIO.NumberOptions
  */
 export const compareText = (
   actual: string,
-  expected: string | RegExp | PartialMatcher,
+  expected: MatcherTextValue,
   {
     ignoreCase = false,
     trim = true,
@@ -530,11 +538,12 @@ export const compareText = (
     if (typeof expected === 'string') {
       expected = expected.toLowerCase();
     } else if (isStringContainingMatcher(expected)) {
+      const sampleLower = (expected.sample?.toString() ?? expected.toString()).toLowerCase();
       expected = (
         expected.toString() === 'StringContaining'
-          ? expect.stringContaining(expected.sample?.toString().toLowerCase())
-          : expect.not.stringContaining(expected.sample?.toString().toLowerCase())
-      ) as PartialMatcher;
+          ? expect.stringContaining(sampleLower)
+          : expect.not.stringContaining(sampleLower)
+      ) as MatcherPartial<string>;
     }
   }
 
@@ -589,16 +598,17 @@ export const compareText = (
 const asymmetricMatcher =
   typeof Symbol === 'function' && Symbol.for ? Symbol.for('jest.asymmetricMatcher') : 0x13_57_a5;
 
-export function isAsymmeyricMatcher(expected: any): expected is PartialMatcher {
+export function isAsymmeyricMatcher(expected: unknown): expected is MatcherPartial<unknown> {
+  if (expected === null || typeof expected !== 'object') return false;
+  const obj = expected as Record<string, unknown>;
   return (
-    typeof expected === 'object' &&
-    '$$typeof' in expected &&
-    expected.$$typeof === asymmetricMatcher &&
-    expected.asymmetricMatch
+    '$$typeof' in obj &&
+    obj.$$typeof === asymmetricMatcher &&
+    typeof obj.asymmetricMatch === 'function'
   );
 }
 
-function isStringContainingMatcher(expected: any): expected is PartialMatcher {
+function isStringContainingMatcher(expected: unknown): expected is MatcherPartial<string> {
   return isAsymmeyricMatcher(expected) && ['StringContaining', 'StringNotContaining'].includes(expected.toString());
 }
 

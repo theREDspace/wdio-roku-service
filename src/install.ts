@@ -77,9 +77,9 @@ const createBlobFromStream = (
   contentType = 'application/octet-stream',
 ): Promise<Blob> => {
   return new Promise((resolve, reject) => {
-    const chunks: Uint8Array[] = [];
-    stream.on('data', (chunk: Uint8Array) => {
-      chunks.push(chunk);
+    const chunks: BlobPart[] = [];
+    stream.on('data', (chunk: string | Buffer) => {
+      chunks.push(typeof chunk === 'string' ? chunk : Uint8Array.from(chunk).buffer);
     });
     stream.on('end', () => {
       const blob = new Blob(chunks, { type: contentType });

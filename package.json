@@ -42,6 +42,14 @@
     "./install": {
       "import": "./dist/install.js",
       "types": "./dist/install.d.ts"
+    },
+    "./telnet": {
+      "import": "./dist/telnet.js",
+      "types": "./dist/telnet.d.ts"
+    },
+    "./logs": {
+      "import": "./dist/logs/index.js",
+      "types": "./dist/logs/index.d.ts"
     }
   },
   "dependencies": {

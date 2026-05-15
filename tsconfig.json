@@ -8,6 +8,7 @@
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
         /* Emit */
+        "rootDir": "./src" /* Keep emitted file layout rooted to the source tree. */,
         "declaration": false /* Generate .d.ts files from TypeScript and JavaScript files in your project. */,
         "outDir": "./dist" /* Specify an output folder for all emitted files. */,
         /* Interop Constraints */
