@@ -128,6 +128,7 @@ See the `.env.example` file. Copy it and rename it to `.env` within your Webdriv
 * `isFocused` will check for an attribute `focused` on the element being true.
 * `isDisplayed` will check for an attribute `bounds` on the element, and that `visible` is not set to false. If `withinViewport` is set, the bounds will be compared against the Roku's screen size.
 * `getSize` and `getLocation` take the values from the `bounds` attribute, returning 0 for size and -Infinity for position if it isn't present.
+* `waitForFocused` is a new command that waits for the `focused` attribute (as used by `isFocused`) to become true (or false, if `reverse` is set).
 
 Other functions have not been changed, but many still work as expected.
 
