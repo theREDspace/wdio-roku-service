@@ -342,6 +342,11 @@ This pattern keeps one logger connected across all tests, creates a fresh stream
 > **Important:** `onPrepare` runs in the WDIO **launcher process**, which is a separate Node.js process from the workers where your tests execute. Module-level state (like a telnet logger instance) created in `onPrepare` is **not shared** with workers. Always initialize telnet in `before` (which runs in the worker).
 
 Helper module (`helpers/telnet-manager.ts`):
+
+This helper intentionally uses both APIs:
+* `createLogStream()` drives per-line streaming and local `streamData` aggregation.
+* `startCapture()` / `stopCapture()` keep `logger.capturing` state accurate for the `beforeTest` guard and maintain clear per-test capture boundaries.
+
 ```ts
 import { RokuTelnetLogger } from 'wdio-roku-service/telnet';
 import { PassThrough } from 'stream';
@@ -373,6 +378,7 @@ export function startTestStream() {
   }
 
   streamData = [];
+  logger.startCapture();
   currentStream = logger.createLogStream();
 
   currentStream.on('data', (chunk: Buffer | string) => {
@@ -382,10 +388,14 @@ export function startTestStream() {
 }
 
 export async function stopTestStream(filePath?: string): Promise<string[]> {
+  if (!logger) throw new Error('Logger not initialized');
+
   if (currentStream) {
     currentStream.destroy();
     currentStream = null;
   }
+
+  await logger.stopCapture();
 
   const data = streamData;
   streamData = [];
