@@ -1,6 +1,6 @@
 {
   "name": "wdio-roku-service",
-  "version": "2.1.0",
+  "version": "2.2.0",
   "description": "WebdriverIO service to facilitate Roku testing",
   "author": "REDspace",
   "homepage": "https://github.com/theREDspace/wdio-roku-service",
