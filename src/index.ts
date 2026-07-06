@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-namespace */
 import RokuWorkerService from './service.js';
+import type { WaitForOptions } from 'webdriverio';
 
 export default RokuWorkerService;
 export { RokuTelnetLogger, connectTelnet } from './telnet.js';
@@ -27,6 +28,13 @@ declare global {
        * @returns The result from browser.url()
        */
       openRokuXML: () => Promise<void | WebdriverIO.Request>;
+    }
+    interface Element {
+      /**
+       * Waits for an element to become focused (or unfocused, if `reverse` is set), based on the `focused` attribute.
+       * @param options WaitForOptions (timeout, interval, reverse, timeoutMsg)
+       */
+      waitForFocused: (options?: WaitForOptions) => Promise<boolean>;
     }
   }
   namespace NodeJS {

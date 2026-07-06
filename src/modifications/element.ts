@@ -59,6 +59,27 @@ export function applyElementModifications(browser: WebdriverIO.Browser) {
     true,
   );
 
+  browser.addCommand(
+    'waitForFocused',
+    async function (this: WebdriverIO.Element, options: WaitForOptions = {}) {
+      const { reverse = false, timeout, interval, timeoutMsg } = options;
+      return this.waitUntil(
+        async () => {
+          const focused = await this.isFocused();
+          return reverse ? !focused : focused;
+        },
+        {
+          timeout,
+          interval,
+          timeoutMsg:
+            timeoutMsg ??
+            `element ("${this.selector}") still ${reverse ? 'is' : 'is not'} focused after ${timeout ?? 'default'}ms`,
+        },
+      );
+    },
+    { attachToElement: true },
+  );
+
   browser.overwriteCommand(
     'isDisplayed',
     async function (
